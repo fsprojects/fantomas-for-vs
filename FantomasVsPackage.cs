@@ -38,7 +38,7 @@ namespace FantomasVs
     [Guid(FantomasVsPackage.PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [InstalledProductRegistration("F# Formatting", "", "FantomasVs", IconResourceID = 400)]
-    [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Fantomas", 0, 0, true)]
+    [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Formatting", 0, 0, true)]
 
     public sealed partial class FantomasVsPackage : AsyncPackage
     {
@@ -55,7 +55,6 @@ namespace FantomasVs
         public IComponentModel MefHost { get; private set; }
 
         public IVsStatusbar Statusbar { get; private set; }
-
 
         #region Package Members
 
@@ -75,6 +74,7 @@ namespace FantomasVs
             MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
             
+            // signal that package is ready
             _instance.SetResult(this);
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
