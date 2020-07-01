@@ -16,6 +16,8 @@ namespace FantomasVs
         public const string GuidString = "74927147-72e8-4b47-a70d-5568807d6878";
 
         public static FormatConfig.FormatConfig Defaults => FormatConfig.FormatConfig.Default;
+        
+        #region Indent
 
         [Category("Indentation")]
         [DisplayName("Indent on Try...With")]
@@ -25,6 +27,10 @@ namespace FantomasVs
         [DisplayName("Indent Number of Spaces")]
         public int IndentSpaceNum { get; set; } = Defaults.IndentSpaceNum;
 
+        #endregion
+        
+        #region Boundaries
+
         [Category("Boundaries")]
         [DisplayName("Page Width")]
         public int PageWidth { get; set; } = Defaults.PageWidth;
@@ -33,10 +39,13 @@ namespace FantomasVs
         [DisplayName("Maximum If-Then-Else Width")]
         public int MaxIfThenElseShortWidth { get; set; } = Defaults.MaxIfThenElseShortWidth;
 
+        #endregion
+
+        #region Convention
+
         [Category("Convention")]
         [DisplayName("Semicolon at  End of Line")]
         public bool SemicolonAtEndOfLine { get; set; } = Defaults.SemicolonAtEndOfLine;
-
 
         [Category("Convention")]
         [DisplayName("Strict Mode")]
@@ -45,6 +54,9 @@ namespace FantomasVs
         [Category("Convention")]
         [DisplayName("Keep Newline After")]
         public bool KeepNewlineAfter { get; set; } = Defaults.KeepNewlineAfter;
+        #endregion
+
+        #region Spacing
 
         [Category("Spacing")]
         [DisplayName("Space Before Argument")]
@@ -71,18 +83,35 @@ namespace FantomasVs
         [DisplayName("Space Around Delimiter")]
         public bool SpaceAroundDelimiter { get; set; } = Defaults.SpaceAroundDelimiter;
 
+        #endregion
+
+        #region Ordering
 
         [Category("Ordering")]
         [DisplayName("Reorder Open Declaration")]
         public bool ReorderOpenDeclaration { get; set; } = Defaults.ReorderOpenDeclaration;
 
+        #endregion
+        
+        #region Performance
+
         [Category("Performance")]
         [DisplayName("Apply As Diff")]
+        [Description("Applies the formatting as changes, which shows which lines were changed. Turn off if computing the diff is too slow. ")]
         public bool ApplyDiff { get; set; } = true;
 
         [Category("Performance")]
-        [DisplayName("Warmup Fantomas")]
-        public bool WarmUpOnStartup { get; set; }
+        [DisplayName("Warmup On Start")]
+        public bool WarmUpOnStartup { get; set; } = true;
 
+        #endregion
+
+        #region On Save
+
+        [Category("On Save")]
+        [DisplayName("Format On Save")]
+        public bool FormatOnSave { get; set; } = false;
+
+        #endregion
     }
 }
