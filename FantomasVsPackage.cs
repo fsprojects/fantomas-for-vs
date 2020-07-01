@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
@@ -36,8 +37,7 @@ namespace FantomasVs
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(FantomasVsPackage.PackageGuidString)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
-
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("F# Formatting", "", "FantomasVs", IconResourceID = 400)]
     [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Fantomas", 0, 0, true)]
 
     public sealed partial class FantomasVsPackage : AsyncPackage
@@ -47,11 +47,14 @@ namespace FantomasVs
         /// </summary>
         public const string PackageGuidString = "74927147-72e8-4b47-a80d-5568807d6878";
 
-        public static FantomasVsPackage Instance { get; private set; }
+        private static TaskCompletionSource<FantomasVsPackage> _instance = new TaskCompletionSource<FantomasVsPackage>();
+        public static Task<FantomasVsPackage> Instance => _instance.Task;
 
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage;
 
         public IComponentModel MefHost { get; private set; }
+
+        public IVsStatusbar Statusbar { get; private set; }
 
 
         #region Package Members
@@ -64,17 +67,20 @@ namespace FantomasVs
         /// <param name="progress">A provider for progress updates.</param>
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-        {
-            // When initialized asynchronously, the current thread may be a background thread at this point.
-            // Do any initialization that requires the UI thread after switching to the UI thread.
-            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
+        {            
             Trace.WriteLine("----------------------------------------------");
             Trace.WriteLine("Fantomas VS Loaded");
             Trace.WriteLine("----------------------------------------------");
 
-            Instance = this;
-            MefHost = await GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
+            Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
+            
+            _instance.SetResult(this);
+
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
         }
 
         #endregion

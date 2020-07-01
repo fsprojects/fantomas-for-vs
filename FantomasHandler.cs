@@ -26,6 +26,9 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using Task = System.Threading.Tasks.Task;
 using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
+using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
+using Microsoft.VisualStudio;
 
 namespace FantomasVs
 {
@@ -39,7 +42,7 @@ namespace FantomasVs
         public string DisplayName => "Automatic Formatting";
 
 
-        private Lazy<FSharpChecker> _checker = new Lazy<FSharpChecker>(() => 
+        private Lazy<FSharpChecker> _checker = new Lazy<FSharpChecker>(() =>
             FSharpChecker.Create(null, null, null, null, null, null, null, null)
         );
         protected FSharpChecker CheckerInstance => _checker.Value;
@@ -78,39 +81,27 @@ namespace FantomasVs
         {
             using (var edit = buffer.CreateEdit())
             {
+                var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, new DiffPlex.Chunkers.LineEndingsPreservingChunker());
+                int inserts = 0, deletes = 0;
 
-                var diffBuilder = new InlineDiffBuilder();
-                var diff = diffBuilder.BuildDiffModel(oldText, newText, false);
-                int inserts = 0, deletes = 0, nochanges = 0;
-
-                foreach (var current in diff.Lines)
+                foreach (var current in diff.DiffBlocks)
                 {
-                    var line = nochanges + deletes;
+                    var start = current.DeleteStartA;
 
-                    switch (current.Type)
+                    for (int i = 0; i < current.DeleteCountA; i++)
                     {
-                        case ChangeType.Deleted:
-                            {
-                                var ln = snap.GetLineFromLineNumber(line);
-                                edit.Delete(ln.ExtentIncludingLineBreak);
-                                deletes++;
-                                break;
-                            }
-
-                        case ChangeType.Inserted:
-                            {
-                                var ln = snap.GetLineFromLineNumber(Math.Max(0, line - 1));
-                                edit.Insert(ln.EndIncludingLineBreak.Position, current.Text + Environment.NewLine);
-                                inserts++;
-                                break;
-                            }
-
-                        default:
-                            {
-                                nochanges++;
-                                break;
-                            }
+                        var ln = snap.GetLineFromLineNumber(start + i);
+                        edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
+                        deletes++;
                     }
+
+                    for (int i = 0; i < current.InsertCountB; i++)
+                    {
+                        var ln = snap.GetLineFromLineNumber(start);
+                        edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
+                        inserts++;
+                    }
+
                 }
 
                 edit.Apply();
@@ -120,9 +111,24 @@ namespace FantomasVs
 
         public async Task FormatAsync(EditorCommandArgs args, CancellationToken token)
         {
-            var buffer = args.TextView.TextBuffer;
+            var instance = await FantomasVsPackage.Instance;
+            var statusBar = instance.Statusbar;
 
-            var fantopts = FantomasVsPackage.Instance?.Options ?? new FantomasOptionsPage();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
+            // Make sure the status bar is not frozen
+
+            if (statusBar.IsFrozen(out var frozen) == VSConstants.S_OK && frozen != 0)            
+                statusBar.FreezeOutput(0);            
+
+            // Set the status bar text and make its display static.
+            statusBar.SetText("Formatting...");
+
+            await Task.Yield();
+
+            var buffer = args.TextView.TextBuffer;
+            var caret = args.TextView.Caret.Position;
+
+            var fantopts = instance.Options;
             var defaults = FSharpParsingOptions.Default;
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
@@ -138,7 +144,7 @@ namespace FantomasVs
                 isInteractive: defaults.IsInteractive,
                 lightSyntax: defaults.LightSyntax,
                 compilingFsLib: defaults.CompilingFsLib,
-                isExe: oldText.Contains("[<EntryPoint>]")
+                isExe: true //oldText.LastIndexOf("[<EntryPoint>]") != -1
             );
 
             var origin = SourceOrigin.SourceOrigin.NewSourceString(oldText);
@@ -150,6 +156,7 @@ namespace FantomasVs
             try
             {
                 var newText = await FSharpAsync.StartAsTask(fsasync, null, token);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
 
                 if (fantopts.ApplyDiff)
                 {
@@ -162,10 +169,17 @@ namespace FantomasVs
             }
             catch (Exception ex)
             {
-
                 Trace.TraceError(ex.ToString());
+                statusBar.SetText($"Could not format: {ex.Message.Replace(path, "")}");
+                await Task.Delay(2000);
             }
 
+            statusBar.SetText("Ready.");
+            args.TextView.Caret.MoveTo(
+                caret
+                .VirtualBufferPosition
+                .TranslateTo(buffer.CurrentSnapshot)
+            );
         }
 
         public bool ExecuteCommand(FormatDocumentCommandArgs args, CommandExecutionContext executionContext)
