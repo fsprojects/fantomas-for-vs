@@ -1,36 +1,24 @@
-﻿using DiffPlex;
-using DiffPlex.DiffBuilder;
-using DiffPlex.DiffBuilder.Model;
-using Fantomas;
-using FSharp.Compiler;
+﻿using System;
+using DiffPlex;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
 using Microsoft.VisualStudio.Commanding;
-using Microsoft.VisualStudio.Debugger.ComponentInterfaces;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.Commanding;
 using Microsoft.VisualStudio.Text.Editor.Commanding.Commands;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Utilities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Markup;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Threading;
+using Fantomas;
 using Task = System.Threading.Tasks.Task;
 using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
-using Microsoft.VisualStudio.Shell.Interop;
-using EnvDTE;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Threading;
 
 namespace FantomasVs
 {

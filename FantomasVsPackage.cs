@@ -4,41 +4,27 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
-using Microsoft.VisualStudio.Text.Operations;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace FantomasVs
 {
-    /// <summary>
-    /// This is the class that implements the package exposed by this assembly.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// The minimum requirement for a class to be considered a valid package for Visual Studio
-    /// is to implement the IVsPackage interface and register itself with the shell.
-    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the
-    /// IVsPackage interface and uses the registration attributes defined in the framework to
-    /// register itself and its components with the shell. These attributes tell the pkgdef creation
-    /// utility what data to put into .pkgdef file.
-    /// </para>
-    /// <para>
-    /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
-    /// </para>
-    /// DO NOT REMOVE THIS MAGICAL INCANTATION NO MATTER HOW MUCH
-    /// VS WARNS YOU OF DEPRECATION
-    /// </remarks>
+
+    // DO NOT REMOVE THIS MAGICAL INCANTATION NO MATTER HOW MUCH VS WARNS YOU OF DEPRECATION    
+    // --------------------------------------------------------------------------------------
+    [InstalledProductRegistration("F# Formatting", "", "FantomasVs", IconResourceID = 400)]
+    // --------------------------------------------------------------------------------------
+
+    // Package registration attributes
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(FantomasVsPackage.PackageGuidString)]
+
+    // Auto load only if a solution is open, this is important too
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
-    [InstalledProductRegistration("F# Formatting", "", "FantomasVs", IconResourceID = 400)]
-    [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Formatting", 0, 0, true)]
+
+    // Options page
+    [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Formatting", 0, 0, supportsAutomation: true)]
 
     public sealed partial class FantomasVsPackage : AsyncPackage
     {
@@ -50,7 +36,7 @@ namespace FantomasVs
         private static TaskCompletionSource<FantomasVsPackage> _instance = new TaskCompletionSource<FantomasVsPackage>();
         public static Task<FantomasVsPackage> Instance => _instance.Task;
 
-        public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage;
+        public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();
 
         public IComponentModel MefHost { get; private set; }
 
@@ -67,9 +53,7 @@ namespace FantomasVs
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {            
-            Trace.WriteLine("----------------------------------------------");
-            Trace.WriteLine("Fantomas VS Loaded");
-            Trace.WriteLine("----------------------------------------------");
+            Trace.WriteLine("Fantomas Vs Package Loaded");
 
             MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
