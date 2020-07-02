@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Threading;
 using Fantomas;
 using Task = System.Threading.Tasks.Task;
 using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
+using FSharp.Compiler;
 
 namespace FantomasVs
 {
@@ -33,7 +34,7 @@ namespace FantomasVs
         ICommandHandler<SaveCommandArgs>
     {
         public string DisplayName => "Automatic Formatting";
-        
+
         #region Checker
 
         private Lazy<FSharpChecker> _checker = new Lazy<FSharpChecker>(() =>
@@ -76,7 +77,7 @@ namespace FantomasVs
 
         #region Patching
 
-        protected void FullReplace(Span span, ITextBuffer buffer, string oldText, string newText)
+        protected void ReplaceAll(Span span, ITextBuffer buffer, string oldText, string newText)
         {
             buffer.Replace(span, newText);
         }
@@ -110,12 +111,20 @@ namespace FantomasVs
 
                 edit.Apply();
             }
-        } 
+        }
         #endregion
+
 
         #region Formatting
 
-        public async Task FormatAsync(SnapshotSpan vspan, EditorCommandArgs args, CommandExecutionContext context)
+        public enum FormatKind
+        {
+            Document,
+            Selection,
+            IsolatedSelection
+        }
+
+        public async Task FormatAsync(SnapshotSpan vspan, EditorCommandArgs args, CommandExecutionContext context, FormatKind kind)
         {
             var token = context.OperationContext.UserCancellationToken;
             var instance = await FantomasVsPackage.Instance.WithCancellation(token);
@@ -131,7 +140,6 @@ namespace FantomasVs
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
 
-            var oldText = vspan.GetText();
 
             var opts = new FSharpParsingOptions(
                 sourceFiles: new string[] { path },
@@ -143,7 +151,6 @@ namespace FantomasVs
                 isExe: true // let's have this on for now
             );
 
-            var origin = SourceOrigin.SourceOrigin.NewSourceString(oldText);
             var checker = CheckerInstance;
             var config = GetOptions(args, fantopts);
 
@@ -151,8 +158,27 @@ namespace FantomasVs
 
             try
             {
-                var fsasync = CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker);
+                var originText = kind switch
+                {
+                    FormatKind.Document => buffer.CurrentSnapshot.GetText(),
+                    FormatKind.Selection => buffer.CurrentSnapshot.GetText(),
+                    FormatKind.IsolatedSelection => vspan.GetText(),
+                    _ => throw new NotSupportedException()
+                };
+
+                var origin = SourceOrigin.SourceOrigin.NewSourceString(originText);
+
+
+                var fsasync = kind switch
+                {
+                    FormatKind.Document => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+                    FormatKind.Selection => CodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
+                    FormatKind.IsolatedSelection => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+                    _ => throw new NotSupportedException()
+                };
+
                 var newText = await FSharpAsync.StartAsTask(fsasync, null, token);
+                var oldText = vspan.GetText();
 
                 if (fantopts.ApplyDiff)
                 {
@@ -160,7 +186,7 @@ namespace FantomasVs
                 }
                 else
                 {
-                    FullReplace(vspan, buffer, oldText, newText);
+                    ReplaceAll(vspan, buffer, oldText, newText);
                 }
             }
             catch (Exception ex)
@@ -172,11 +198,11 @@ namespace FantomasVs
 
             args.TextView.Caret.MoveTo(
                 caret
-                .VirtualBufferPosition
-                .TranslateTo(buffer.CurrentSnapshot)
+                .BufferPosition
+                .TranslateTo(buffer.CurrentSnapshot, PointTrackingMode.Positive)
             );
 
-            if (args is FormatSelectionCommandArgs)
+            if (kind == FormatKind.Selection || kind == FormatKind.IsolatedSelection)
                 args.TextView.Selection.Select(
                     vspan.TranslateTo(args.TextView.TextSnapshot, SpanTrackingMode.EdgeInclusive),
                 false);
@@ -185,11 +211,26 @@ namespace FantomasVs
             await SetStatusAsync("Ready.", instance, token);
         }
 
+        public static Range.range MakeRange(SnapshotSpan vspan, string path)
+        {
+            // Beware that the range argument is inclusive. 
+            // If the range has a trailing newline, it will appear in the formatted result.
+
+            var start = vspan.Start.GetContainingLine();
+            var end = vspan.End.GetContainingLine();
+            var startLine = start.LineNumber + 1;
+            var startCol = Math.Max(0, vspan.Start.Position - start.Start.Position - 1);
+            var endLine = end.LineNumber + 1;
+            var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
+
+            return CodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+        }
+
         public Task FormatAsync(EditorCommandArgs args, CommandExecutionContext context)
         {
             var snapshot = args.TextView.TextSnapshot;
             var vspan = new SnapshotSpan(snapshot, new Span(0, snapshot.Length));
-            return FormatAsync(vspan, args, context);
+            return FormatAsync(vspan, args, context, FormatKind.Document);
         }
 
 
@@ -209,7 +250,7 @@ namespace FantomasVs
         #endregion
 
         #region Logging 
-        
+
         protected void LogTask(Task task)
         {
             var _ = task.ContinueWith(t =>
@@ -217,7 +258,7 @@ namespace FantomasVs
                 if (t.IsFaulted)
                     Trace.TraceError(t.Exception.ToString());
             }, TaskScheduler.Default);
-        } 
+        }
 
         #endregion
 
@@ -254,7 +295,7 @@ namespace FantomasVs
                 return false;
 
             var vspan = new SnapshotSpan(args.TextView.TextSnapshot, selections.Single().Span);
-            LogTask(FormatAsync(vspan, args, executionContext));
+            LogTask(FormatAsync(vspan, args, executionContext, FormatKind.IsolatedSelection));
             return false;
         }
 
@@ -280,7 +321,7 @@ namespace FantomasVs
                 return;
 
             await FormatAsync(args, executionContext);
-        } 
+        }
 
         #endregion
     }

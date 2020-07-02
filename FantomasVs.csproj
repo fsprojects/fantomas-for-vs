@@ -14,6 +14,7 @@
     <ProjectGuid>{37577282-1289-40DB-AD3D-24499BD09DAE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <LangVersion>8.0</LangVersion>
     <RootNamespace>FantomasVs</RootNamespace>
     <AssemblyName>FantomasVs</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
