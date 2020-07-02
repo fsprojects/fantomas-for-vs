@@ -16,11 +16,12 @@ namespace FantomasVs
         #region Indent
 
         [Category("Indentation")]
-        [DisplayName("Indent on Try...With")]
+        [DisplayName("Indent Try-With")]
         public bool IndentOnTryWith { get; set; } = Defaults.IndentOnTryWith;
 
         [Category("Indentation")]
         [DisplayName("Indent Number of Spaces")]
+        [Description("This will normally be set by the editor, this is the value to fallback to.")]
         public int IndentSpaceNum { get; set; } = Defaults.IndentSpaceNum;
 
         #endregion
@@ -98,7 +99,8 @@ namespace FantomasVs
 
         [Category("Performance")]
         [DisplayName("Warmup On Start")]
-        public bool WarmUpOnStartup { get; set; } = true;
+        [Description("Runs through formatting code on startup to warm up the Jit. Reduces delay when first using it.")]
+        public bool WarmUpOnStartup { get; set; } = false;
 
         #endregion
 
