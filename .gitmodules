@@ -1,0 +1,4 @@
+[submodule "fantomas"]
+	path = fantomas
+	url = https://github.com/fsprojects/fantomas.git
+	branch = master

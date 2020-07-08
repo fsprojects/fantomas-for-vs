@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30223.230
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantomasVs", "FantomasVs.csproj", "{37577282-1289-40DB-AD3D-24499BD09DAE}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fantomas", "..\fantomas\src\Fantomas\Fantomas.fsproj", "{68A7626B-C9F7-46AE-B1A8-78CFA1F2D6B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{37577282-1289-40DB-AD3D-24499BD09DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37577282-1289-40DB-AD3D-24499BD09DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37577282-1289-40DB-AD3D-24499BD09DAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68A7626B-C9F7-46AE-B1A8-78CFA1F2D6B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68A7626B-C9F7-46AE-B1A8-78CFA1F2D6B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68A7626B-C9F7-46AE-B1A8-78CFA1F2D6B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68A7626B-C9F7-46AE-B1A8-78CFA1F2D6B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
