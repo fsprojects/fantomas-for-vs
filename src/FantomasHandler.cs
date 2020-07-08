@@ -53,20 +53,36 @@ namespace FantomasVs
             var indentSpaces = localOptions?.GetIndentSize();
 
             var config = new FantomasConfig(
-                indentSpaceNum: indentSpaces ?? fantopts.IndentSpaceNum,
+                indentSize: indentSpaces ?? fantopts.IndentSize,
                 indentOnTryWith: fantopts.IndentOnTryWith,
 
-                pageWidth: fantopts.PageWidth,
+                maxArrayOrListWidth: fantopts.MaxArrayOrListWidth,
+                maxElmishWidth: fantopts.MaxElmishWidth,
+                maxFunctionBindingWidth: fantopts.MaxFunctionBindingWidth,
+                maxValueBindingWidth: fantopts.MaxValueBindingWidth,
+                maxIfThenElseShortWidth: fantopts.MaxIfThenElseShortWidth,
+                maxInfixOperatorExpression: fantopts.MaxInfixOperatorExpression,
+                maxLineLength: fantopts.MaxLineLength,
+                maxRecordWidth: fantopts.MaxRecordWidth,
+                multilineBlockBracketsOnSameColumn: fantopts.MultilineBlockBracketsOnSameColumn,
+                keepIfThenInSameLine: fantopts.KeepIfThenInSameLine,
+                singleArgumentWebMode: fantopts.SingleArgumentWebMode,
+
                 semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
-                spaceBeforeArgument: fantopts.SpaceBeforeArgument,
+
+                spaceBeforeClassConstructor: fantopts.SpaceBeforeClassConstructor,
+                spaceBeforeLowercaseInvocation: fantopts.SpaceBeforeLowercaseInvocation,
+                spaceBeforeUppercaseInvocation: fantopts.SpaceBeforeUppercaseInvocation,
+                spaceBeforeMember: fantopts.SpaceBeforeMember,
+                spaceBeforeParameter: fantopts.SpaceBeforeParameter,
                 spaceBeforeColon: fantopts.SpaceBeforeColon,
                 spaceAfterComma: fantopts.SpaceAfterComma,
                 spaceAfterSemicolon: fantopts.SpaceAfterSemicolon,
                 spaceBeforeSemicolon: fantopts.SpaceBeforeSemicolon,
                 spaceAroundDelimiter: fantopts.SpaceAroundDelimiter,
-                reorderOpenDeclaration: fantopts.ReorderOpenDeclaration,
-                keepNewlineAfter: fantopts.KeepNewlineAfter,
-                maxIfThenElseShortWidth: fantopts.MaxIfThenElseShortWidth,
+
+                newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
+
                 strictMode: fantopts.StrictMode
             );
 

@@ -22,19 +22,47 @@ namespace FantomasVs
         [Category("Indentation")]
         [DisplayName("Indent Number of Spaces")]
         [Description("This will normally be set by the editor, this is the value to fallback to.")]
-        public int IndentSpaceNum { get; set; } = Defaults.IndentSpaceNum;
+        public int IndentSize { get; set; } = Defaults.IndentSize;
 
         #endregion
         
         #region Boundaries
 
         [Category("Boundaries")]
-        [DisplayName("Page Width")]
-        public int PageWidth { get; set; } = Defaults.PageWidth;
+        [DisplayName("Maximum Array or List Width")]
+        public int MaxArrayOrListWidth { get; set; } = Defaults.MaxArrayOrListWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Width for Elmish Views")]
+        public int MaxElmishWidth { get; set; } = Defaults.MaxElmishWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Function Binding Width")]
+        public int MaxFunctionBindingWidth { get; set; } = Defaults.MaxFunctionBindingWidth;
 
         [Category("Boundaries")]
         [DisplayName("Maximum If-Then-Else Width")]
         public int MaxIfThenElseShortWidth { get; set; } = Defaults.MaxIfThenElseShortWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Infix Operator Expression")]
+        public int MaxInfixOperatorExpression { get; set; } = Defaults.MaxInfixOperatorExpression;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Line Length")]
+        public int MaxLineLength { get; set; } = Defaults.MaxLineLength;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Record Width")]
+        public int MaxRecordWidth { get; set; } = Defaults.MaxRecordWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Value Binding Width")]
+        public int MaxValueBindingWidth { get; set; } = Defaults.MaxValueBindingWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Multiline Block Brackets On Same Column")]
+        public bool MultilineBlockBracketsOnSameColumn { get; set; } = Defaults.MultilineBlockBracketsOnSameColumn;
 
         #endregion
 
@@ -50,46 +78,71 @@ namespace FantomasVs
 
         [Category("Convention")]
         [DisplayName("Keep Newline After")]
-        public bool KeepNewlineAfter { get; set; } = Defaults.KeepNewlineAfter;
+        public bool KeepIfThenInSameLine { get; set; } = Defaults.KeepIfThenInSameLine;
+
+
+        [Category("Convention")]
+        [DisplayName("Newline Between Type Definition And Members")]
+        public bool NewlineBetweenTypeDefinitionAndMembers { get; set; } = Defaults.NewlineBetweenTypeDefinitionAndMembers;
+
+
+        [Category("Convention")]
+        [DisplayName("Single-Argument Web Mode")]
+        public bool SingleArgumentWebMode { get; set; } = Defaults.SingleArgumentWebMode;
+
         #endregion
 
         #region Spacing
 
         [Category("Spacing")]
-        [DisplayName("Space Before Argument")]
-        public bool SpaceBeforeArgument { get; set; } = Defaults.SpaceBeforeArgument;
+        [DisplayName("Before Parameter")]
+        public bool SpaceBeforeParameter { get; set; } = Defaults.SpaceBeforeParameter;
 
         [Category("Spacing")]
-        [DisplayName("Space Before Colon")]
+        [DisplayName("Before Colon")]
         public bool SpaceBeforeColon { get; set; } = Defaults.SpaceBeforeColon;
 
         [Category("Spacing")]
-        [DisplayName("Space After Comma")]
+        [DisplayName("After Comma")]
         public bool SpaceAfterComma { get; set; } = Defaults.SpaceAfterComma;
 
         [Category("Spacing")]
-        [DisplayName("Space After Semicolon")]
+        [DisplayName("After Semicolon")]
         public bool SpaceAfterSemicolon { get; set; } = Defaults.SpaceAfterSemicolon;
 
-
         [Category("Spacing")]
-        [DisplayName("Space Before Semicolon")]
+        [DisplayName("Before Semicolon")]
         public bool SpaceBeforeSemicolon { get; set; } = Defaults.SpaceBeforeSemicolon;
 
         [Category("Spacing")]
-        [DisplayName("Space Around Delimiter")]
+        [DisplayName("Around Delimiter")]
         public bool SpaceAroundDelimiter { get; set; } = Defaults.SpaceAroundDelimiter;
+
+
+        [Category("Spacing")]
+        [DisplayName("Before Class Constructor")]
+        public bool SpaceBeforeClassConstructor { get; set; } = Defaults.SpaceBeforeClassConstructor;
+
+        [Category("Spacing")]
+        [DisplayName("Before Lowercase Invocation")]
+        public bool SpaceBeforeLowercaseInvocation { get; set; } = Defaults.SpaceBeforeLowercaseInvocation;
+
+
+        [Category("Spacing")]
+        [DisplayName("Before Uppercase Invocation")]
+        public bool SpaceBeforeUppercaseInvocation { get; set; } = Defaults.SpaceBeforeUppercaseInvocation;
+
+        [Category("Spacing")]
+        [DisplayName("Before Member")]
+        public bool SpaceBeforeMember { get; set; } = Defaults.SpaceBeforeMember;
 
         #endregion
 
         #region Ordering
 
-        [Category("Ordering")]
-        [DisplayName("Reorder Open Declaration")]
-        public bool ReorderOpenDeclaration { get; set; } = Defaults.ReorderOpenDeclaration;
 
         #endregion
-        
+
         #region Performance
 
         [Category("Performance")]
