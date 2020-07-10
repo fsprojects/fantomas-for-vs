@@ -168,7 +168,7 @@ namespace FantomasVs
             );
 
             var checker = CheckerInstance;
-            var config = GetOptions(args, fantopts);
+            var config = (CodeFormatter.TryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
 
             var hasError = false;
 
