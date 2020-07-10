@@ -140,6 +140,8 @@ namespace FantomasVs
             IsolatedSelection
         }
 
+        public bool CommandHandled => true;
+
         public async Task FormatAsync(SnapshotSpan vspan, EditorCommandArgs args, CommandExecutionContext context, FormatKind kind)
         {
             var token = context.OperationContext.UserCancellationToken;
@@ -283,7 +285,7 @@ namespace FantomasVs
         public bool ExecuteCommand(FormatDocumentCommandArgs args, CommandExecutionContext executionContext)
         {
             LogTask(FormatAsync(args, executionContext));
-            return false;
+            return CommandHandled;
         }
 
         public CommandState GetCommandState(FormatDocumentCommandArgs args)
@@ -312,7 +314,7 @@ namespace FantomasVs
 
             var vspan = new SnapshotSpan(args.TextView.TextSnapshot, selections.Single().Span);
             LogTask(FormatAsync(vspan, args, executionContext, FormatKind.IsolatedSelection));
-            return false;
+            return CommandHandled;
         }
 
         #endregion
