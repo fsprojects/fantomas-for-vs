@@ -67,6 +67,8 @@ namespace FantomasVs
                 multilineBlockBracketsOnSameColumn: fantopts.MultilineBlockBracketsOnSameColumn,
                 keepIfThenInSameLine: fantopts.KeepIfThenInSameLine,
                 singleArgumentWebMode: fantopts.SingleArgumentWebMode,
+                alignFunctionSignatureToIndentation: fantopts.AlignFunctionSignatureToIndentation,
+                alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
 
                 semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
 

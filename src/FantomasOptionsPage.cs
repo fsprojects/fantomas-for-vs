@@ -90,6 +90,14 @@ namespace FantomasVs
         [DisplayName("Single-Argument Web Mode")]
         public bool SingleArgumentWebMode { get; set; } = Defaults.SingleArgumentWebMode;
 
+        [Category("Convention")]
+        [DisplayName("Align Function Signature To Indentation")]
+        public bool AlignFunctionSignatureToIndentation { get; set; } = Defaults.AlignFunctionSignatureToIndentation;
+
+        [Category("Convention")]
+        [DisplayName("Alternative Long Member Definitions")]
+        public bool AlternativeLongMemberDefinitions { get; set; } = Defaults.AlternativeLongMemberDefinitions;
+
         #endregion
 
         #region Spacing

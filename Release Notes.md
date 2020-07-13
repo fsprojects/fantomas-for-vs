@@ -1,8 +1,15 @@
 Release Notes
 ============
 
+0.4
+----
+
+* Add MIT license
+* Built against 4.0.0 alpha-013
+
 0.3
 ----
+
 * Add support for .editorconfig
 * Falls back to Visual Stuio configuration if no .editorconfig settings are found
 * Built against 4.0.0 alpha (17bfa28ad)

@@ -33,3 +33,7 @@ Any custom key-bindings for Format Document/Selection are respected. The default
 ## See an issue?
 
 If you see an issue with the Visual Studio integration or with configuration, please [file it here](https://github.com/deviousasti/fsharp-formatting-for-vs/issues).
+
+## License 
+
+F# Formatting is available under the [MIT license](https://mit-license.org). 
