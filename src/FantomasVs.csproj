@@ -59,6 +59,10 @@
     <Compile Include="FantomasVsPackage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="License.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="ReleaseNotes.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
