@@ -26,3 +26,7 @@ Formatting options can be found in `F# Tools > Formatting`
 ## See an issue?
 
 If you see an issue with the Visual Studio integration or with configuration, please [file it here](https://github.com/deviousasti/fsharp-formatting-for-vs/issues).
+
+## License
+
+This project is licensed under the MIT license, a copy of which can be found [here](src/License.txt).
