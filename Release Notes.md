@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.4.1
+----
+
+* Built against 4.0.0 beta-001
+* Upgrade vs build tools
+
 0.4
 ----
 
