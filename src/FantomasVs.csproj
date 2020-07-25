@@ -108,8 +108,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fantomas\src\Fantomas\Fantomas.fsproj">
-      <Project>{68a7626b-c9f7-46ae-b1a8-78cfa1f2d6b0}</Project>
+    <ProjectReference Include="Fantomas.fsproj">
+      <Project>{d835a36f-0f8d-4780-a4a5-a16f6c5f4fde}</Project>
       <Name>Fantomas</Name>
     </ProjectReference>
   </ItemGroup>

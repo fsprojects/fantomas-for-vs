@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Threading;
 using Fantomas;
 using Task = System.Threading.Tasks.Task;
 using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
+using FantomasEditorConfig = Fantomas.Extras.EditorConfig;
 using FSharp.Compiler;
 
 namespace FantomasVs
@@ -172,7 +173,7 @@ namespace FantomasVs
             );
 
             var checker = CheckerInstance;
-            var config = (CodeFormatter.TryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
+            var config = (FantomasEditorConfig.tryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
 
             var hasError = false;
 

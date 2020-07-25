@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.4.2
+----
+
+* Built against 4.0.0 beta-002
+* Directly built for net48, no ILRepack
+
 0.4.1
 ----
 
