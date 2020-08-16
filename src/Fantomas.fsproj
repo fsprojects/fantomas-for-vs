@@ -33,6 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="editorconfig" Version="0.12.2" />
-    <PackageReference Include="FSharp.Compiler.Service" Version="36.0.3" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="37.0.0" />
   </ItemGroup>
 </Project>
