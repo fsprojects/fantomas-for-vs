@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.4.3
+----
+
+* Moved to FCS 37.0
+* Built against 4.0.0 beta-004
+
 0.4.2
 ----
 
