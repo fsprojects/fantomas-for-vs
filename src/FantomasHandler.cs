@@ -244,7 +244,8 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            return CodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            var range = CodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            return range;
         }
 
         public Task FormatAsync(EditorCommandArgs args, CommandExecutionContext context)
@@ -309,14 +310,14 @@ namespace FantomasVs
         {
             var selections = args.TextView.Selection.SelectedSpans;
 
-            // This command shouldn't be executed 
+            // This command shouldn't be called 
             // if there's no selection, but it's bad practice
             // to surface exceptions to VS
             if (selections.Count == 0)
                 return false;
 
             var vspan = new SnapshotSpan(args.TextView.TextSnapshot, selections.Single().Span);
-            LogTask(FormatAsync(vspan, args, executionContext, FormatKind.IsolatedSelection));
+            LogTask(FormatAsync(vspan, args, executionContext, FormatKind.Selection));
             return CommandHandled;
         }
 
