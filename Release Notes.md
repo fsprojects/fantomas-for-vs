@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.4.4
+----
+
+* Fantomas 4.0.0 stable August release
+* Format selection in fantomas instead of isolated selection (still sensitive to whitespace)
+
 0.4.3
 ----
 
