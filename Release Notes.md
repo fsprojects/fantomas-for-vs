@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+0.4.6
+----
+
+* Built against Fantomas 4.1.1 stable
+
 0.4.5
 ----
 
