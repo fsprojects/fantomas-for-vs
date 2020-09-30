@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.5
+----
+
+* Support MultilineFormatter selection and additional options
+* Built against Fantomas late September release
+
 0.4.6
 ----
 
