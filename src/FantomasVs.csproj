@@ -88,6 +88,9 @@
     <PackageReference Include="DiffPlex">
       <Version>1.6.3</Version>
     </PackageReference>
+    <PackageReference Include="editorconfig">
+      <Version>0.12.2</Version>
+    </PackageReference>
     <PackageReference Include="FSharp.Compiler.Service">
       <Version>37.0.0</Version>
     </PackageReference>
@@ -112,8 +115,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Fantomas.fsproj">
-      <Project>{d835a36f-0f8d-4780-a4a5-a16f6c5f4fde}</Project>
+    <ProjectReference Include="Fantomas\Fantomas.fsproj">
+      <Project>{a96fc3fb-ad45-4420-878d-78e63e3fb137}</Project>
       <Name>Fantomas</Name>
     </ProjectReference>
   </ItemGroup>
