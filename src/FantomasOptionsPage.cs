@@ -57,12 +57,50 @@ namespace FantomasVs
         public int MaxRecordWidth { get; set; } = Defaults.MaxRecordWidth;
 
         [Category("Boundaries")]
+        [DisplayName("Maximum Record Items")]
+        public int MaxRecordNumberOfItems { get; set; } = Defaults.MaxRecordNumberOfItems;
+
+        public enum MultilineFormatterType
+        {
+            CharacterWidth = 0,
+            NumberOfItems = 1
+        }
+
+        public static FormatConfig.MultilineFormatterType ConvertFormatterType(MultilineFormatterType type) =>
+            type switch
+            {
+                MultilineFormatterType.CharacterWidth => FormatConfig.MultilineFormatterType.CharacterWidth,
+                MultilineFormatterType.NumberOfItems => FormatConfig.MultilineFormatterType.NumberOfItems,
+                _ => FormatConfig.MultilineFormatterType.CharacterWidth
+            };
+
+        [Category("Boundaries")]
+        [DisplayName("Record Multi-line formatter")]
+        public MultilineFormatterType RecordMultilineFormatterConfig { get; set; } = MultilineFormatterType.CharacterWidth;
+
+        [Category("Boundaries")]
+        [DisplayName("Array/List Multi-line formatter")]
+        public MultilineFormatterType ArrayOrListMultilineFormatterConfig { get; set; } = MultilineFormatterType.CharacterWidth;
+
+        public FormatConfig.MultilineFormatterType RecordMultilineFormatter => ConvertFormatterType(RecordMultilineFormatterConfig);
+
+        public FormatConfig.MultilineFormatterType ArrayOrListMultilineFormatter => ConvertFormatterType(ArrayOrListMultilineFormatterConfig);
+
+        [Category("Boundaries")]
         [DisplayName("Maximum Value Binding Width")]
         public int MaxValueBindingWidth { get; set; } = Defaults.MaxValueBindingWidth;
 
         [Category("Boundaries")]
+        [DisplayName("Maximum Array/List Number Of Items")]
+        public int MaxArrayOrListNumberOfItems { get; set; } = Defaults.MaxArrayOrListNumberOfItems;
+
+        [Category("Boundaries")]
         [DisplayName("Multiline Block Brackets On Same Column")]
         public bool MultilineBlockBracketsOnSameColumn { get; set; } = Defaults.MultilineBlockBracketsOnSameColumn;
+
+        [Category("Boundaries")]
+        [DisplayName("Maximum Dot Get Expression Width")]
+        public int MaxDotGetExpressionWidth { get; set; } = Defaults.MaxDotGetExpressionWidth;
 
         #endregion
 
