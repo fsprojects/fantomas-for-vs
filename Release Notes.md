@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.6
+----
+
+* Update to FCS 38
+* Built against Fantomas 4.2
+
 0.5
 ----
 
