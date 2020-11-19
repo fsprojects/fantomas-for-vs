@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
 using Fantomas;
+using System.Xml.Serialization;
 
 namespace FantomasVs
 {
@@ -25,7 +26,15 @@ namespace FantomasVs
         public int IndentSize { get; set; } = Defaults.IndentSize;
 
         #endregion
+
+        #region Elmish
         
+        [Category("Elmish")]
+        [DisplayName("Disable for Elmish Syntax")]
+        public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax; 
+
+        #endregion
+
         #region Boundaries
 
         [Category("Boundaries")]
@@ -82,9 +91,8 @@ namespace FantomasVs
         [DisplayName("Array/List Multi-line formatter")]
         public MultilineFormatterType ArrayOrListMultilineFormatterConfig { get; set; } = MultilineFormatterType.CharacterWidth;
 
-        public FormatConfig.MultilineFormatterType RecordMultilineFormatter => ConvertFormatterType(RecordMultilineFormatterConfig);
-
-        public FormatConfig.MultilineFormatterType ArrayOrListMultilineFormatter => ConvertFormatterType(ArrayOrListMultilineFormatterConfig);
+        internal FormatConfig.MultilineFormatterType RecordMultilineFormatter => ConvertFormatterType(RecordMultilineFormatterConfig);
+        internal FormatConfig.MultilineFormatterType ArrayOrListMultilineFormatter => ConvertFormatterType(ArrayOrListMultilineFormatterConfig);
 
         [Category("Boundaries")]
         [DisplayName("Maximum Value Binding Width")]
