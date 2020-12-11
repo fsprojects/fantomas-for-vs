@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.7
+----
+
+* Built against Fantomas 4.3 alpha
+* Add support for line-ending options (and more)
+
 0.6
 ----
 

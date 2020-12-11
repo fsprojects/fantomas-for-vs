@@ -145,6 +145,7 @@ namespace FantomasVs
 
         [Category("Convention")]
         [DisplayName("Strict Mode")]
+        [Description("Pretty printing the ASTs only (strips trivia like comments)")]
         public bool StrictMode { get; set; } = Defaults.StrictMode;
 
         [Category("Convention")]
