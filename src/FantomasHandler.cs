@@ -76,6 +76,8 @@ namespace FantomasVs
                 singleArgumentWebMode: fantopts.SingleArgumentWebMode,
                 alignFunctionSignatureToIndentation: fantopts.AlignFunctionSignatureToIndentation,
                 alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
+                multiLineLambdaClosingNewline: fantopts.MultiLineLambdaClosingNewline,
+                endOfLine: fantopts.EndOfLine,
 
                 semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
 
@@ -111,31 +113,29 @@ namespace FantomasVs
         {
             var snapshot = buffer.CurrentSnapshot;
 
-            using (var edit = buffer.CreateEdit())
+            using var edit = buffer.CreateEdit();
+            var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, new DiffPlex.Chunkers.LineEndingsPreservingChunker());
+            var lineOffset = snapshot.GetLineNumberFromPosition(span.Start);
+
+            foreach (var current in diff.DiffBlocks)
             {
-                var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, new DiffPlex.Chunkers.LineEndingsPreservingChunker());
-                var lineOffset = snapshot.GetLineNumberFromPosition(span.Start);
+                var start = lineOffset + current.DeleteStartA;
 
-                foreach (var current in diff.DiffBlocks)
+                for (int i = 0; i < current.DeleteCountA; i++)
                 {
-                    var start = lineOffset + current.DeleteStartA;
-
-                    for (int i = 0; i < current.DeleteCountA; i++)
-                    {
-                        var ln = snapshot.GetLineFromLineNumber(start + i);
-                        edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
-                    }
-
-                    for (int i = 0; i < current.InsertCountB; i++)
-                    {
-                        var ln = snapshot.GetLineFromLineNumber(start);
-                        edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
-                    }
-
+                    var ln = snapshot.GetLineFromLineNumber(start + i);
+                    edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
                 }
 
-                edit.Apply();
+                for (int i = 0; i < current.InsertCountB; i++)
+                {
+                    var ln = snapshot.GetLineFromLineNumber(start);
+                    edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
+                }
+
             }
+
+            edit.Apply();
         }
         #endregion
 

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
 using Fantomas;
 using System.Xml.Serialization;
+using EditorConfig.Core;
 
 namespace FantomasVs
 {
@@ -103,8 +104,32 @@ namespace FantomasVs
         public int MaxArrayOrListNumberOfItems { get; set; } = Defaults.MaxArrayOrListNumberOfItems;
 
         [Category("Boundaries")]
+        [DisplayName("MultiLine Lambda Closing Newline")]
+        public bool MultiLineLambdaClosingNewline  { get; set; } = Defaults.MultiLineLambdaClosingNewline;
+
+        [Category("Boundaries")]
         [DisplayName("Multiline Block Brackets On Same Column")]
         public bool MultilineBlockBracketsOnSameColumn { get; set; } = Defaults.MultilineBlockBracketsOnSameColumn;
+
+        public enum LineEndingStyle
+        {
+            CR = FormatConfig.EndOfLineStyle.Tags.CR,
+            LF = FormatConfig.EndOfLineStyle.Tags.LF,
+            CRLF = FormatConfig.EndOfLineStyle.Tags.CRLF,
+        }
+
+        [Category("Boundaries")]
+        [DisplayName("End Of Line Style")]
+        public LineEndingStyle EndOfLineStyle { get; set; } = LineEndingStyle.CRLF;
+
+        public FormatConfig.EndOfLineStyle EndOfLine
+            => this.EndOfLineStyle switch
+            {
+                LineEndingStyle.CR => FormatConfig.EndOfLineStyle.CR,
+                LineEndingStyle.CRLF => FormatConfig.EndOfLineStyle.CRLF,
+                LineEndingStyle.LF => FormatConfig.EndOfLineStyle.LF,
+                _ => FormatConfig.EndOfLineStyle.FromEnvironment
+            };
 
         [Category("Boundaries")]
         [DisplayName("Maximum Dot Get Expression Width")]
