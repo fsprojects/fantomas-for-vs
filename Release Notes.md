@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+0.7.1
+----
+
+* Bugfix release
+
 0.7
 ----
 
