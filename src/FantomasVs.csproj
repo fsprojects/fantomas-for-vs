@@ -124,6 +124,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\fsharp-highlighting\src\FSharp.Highlighting.fsproj">
+      <Project>{deb978d8-90cf-4797-9408-24ba36ed50c0}</Project>
+      <Name>FSharp.Highlighting</Name>
+    </ProjectReference>
     <ProjectReference Include="Fantomas\Fantomas.fsproj">
       <Project>{a96fc3fb-ad45-4420-878d-78e63e3fb137}</Project>
       <Name>Fantomas</Name>
