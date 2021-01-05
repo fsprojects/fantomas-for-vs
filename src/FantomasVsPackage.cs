@@ -11,7 +11,7 @@ using Task = System.Threading.Tasks.Task;
 namespace FantomasVs
 {
 
-    // DO NOT REMOVE THIS MAGICAL INCANTATION NO MATTER HOW MUCH VS WARNS YOU OF DEPRECATION    
+    // DO NOT REMOVE THIS MAGICAL INCANTATION NO MATTER HOW MUCH VS WARNS YOU OF DEPRECATION
     // --------------------------------------------------------------------------------------
     [InstalledProductRegistration("F# Formatting", "F# source code formatting using Fantomas.", "0.7.3", IconResourceID = 400)]
     // --------------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ namespace FantomasVs
 
     // Options page
     [ProvideOptionPage(typeof(FantomasOptionsPage), "F# Tools", "Formatting", 0, 0, supportsAutomation: true)]
+    [ProvideOptionPage(typeof(FantomasOptionsDialogPage), "F# Tools", "Formatting 2", 0, 0, supportsAutomation: true)]
 
     public sealed partial class FantomasVsPackage : AsyncPackage
     {
@@ -37,6 +38,7 @@ namespace FantomasVs
         public static Task<FantomasVsPackage> Instance => _instance.Task;
 
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();
+        public FantomasOptionsDialogPage Options2 => GetDialogPage(typeof(FantomasOptionsDialogPage)) as FantomasOptionsDialogPage ?? new FantomasOptionsDialogPage();
 
         public IComponentModel MefHost { get; private set; }
 
@@ -52,12 +54,12 @@ namespace FantomasVs
         /// <param name="progress">A provider for progress updates.</param>
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-        {            
+        {
             Trace.WriteLine("Fantomas Vs Package Loaded");
 
             MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
-            
+
             // signal that package is ready
             _instance.SetResult(this);
 
