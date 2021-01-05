@@ -50,10 +50,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ContentTypeNames.cs" />
+    <Compile Include="FantomasOptionsDialogPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FantomasOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FantomasHandler.cs" />
+    <Compile Include="FantomasOptionsPage2.xaml.cs">
+      <DependentUpon>FantomasOptionsPage2.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FantomasWarmUp.cs" />
     <Compile Include="PredefinedCommandHandlerNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,6 +125,12 @@
       <Project>{a96fc3fb-ad45-4420-878d-78e63e3fb137}</Project>
       <Name>Fantomas</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="FantomasOptionsPage2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
