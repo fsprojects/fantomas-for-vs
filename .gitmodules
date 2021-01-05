@@ -3,5 +3,5 @@
 	url = https://github.com/fsprojects/fantomas.git
 	branch = master
 [submodule "fsharp-highlighting"]
-	path = fsharp-highlighting
+	path = config/highlighting
 	url = https://github.com/deviousasti/fsharp-highlighting.git
