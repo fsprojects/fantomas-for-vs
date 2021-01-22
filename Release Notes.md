@@ -1,10 +1,17 @@
 Release Notes
 ============
 
+0.7.2
+----
+
+* Format on Save forces save if formatting results in a change
+* Update Fantomas to 4.4.0 alpha
+* Update to FCS 38.0.2
+
 0.7.1
 ----
 
-* Bugfix release
+* Fantomas Bugfix release
 
 0.7
 ----
