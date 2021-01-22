@@ -104,12 +104,16 @@ namespace FantomasVs
 
         #region Patching
 
-        protected void ReplaceAll(Span span, ITextBuffer buffer, string oldText, string newText)
+        protected bool ReplaceAll(Span span, ITextBuffer buffer, string oldText, string newText)
         {
+            if(oldText == newText)
+                return false;
+            
             buffer.Replace(span, newText);
+            return true;
         }
 
-        protected void DiffPatch(Span span, ITextBuffer buffer, string oldText, string newText)
+        protected bool DiffPatch(Span span, ITextBuffer buffer, string oldText, string newText)
         {
             var snapshot = buffer.CurrentSnapshot;
 
@@ -136,6 +140,8 @@ namespace FantomasVs
             }
 
             edit.Apply();
+            
+            return diff.DiffBlocks.Any();
         }
         #endregion
 
@@ -151,7 +157,7 @@ namespace FantomasVs
 
         public bool CommandHandled => true;
 
-        public async Task FormatAsync(SnapshotSpan vspan, EditorCommandArgs args, CommandExecutionContext context, FormatKind kind)
+        public async Task<bool> FormatAsync(SnapshotSpan vspan, EditorCommandArgs args, CommandExecutionContext context, FormatKind kind)
         {
             var token = context.OperationContext.UserCancellationToken;
             var instance = await FantomasVsPackage.Instance.WithCancellation(token);
@@ -166,7 +172,7 @@ namespace FantomasVs
             var defaults = FSharpParsingOptions.Default;
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
-
+            var hasDiff = false;
 
             var opts = new FSharpParsingOptions(
                 sourceFiles: new string[] { path },
@@ -209,11 +215,11 @@ namespace FantomasVs
 
                 if (fantopts.ApplyDiff)
                 {
-                    DiffPatch(vspan, buffer, oldText, newText);
+                    hasDiff = DiffPatch(vspan, buffer, oldText, newText);
                 }
                 else
                 {
-                    ReplaceAll(vspan, buffer, oldText, newText);
+                    hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
                 }
             }
             catch (Exception ex)
@@ -236,6 +242,8 @@ namespace FantomasVs
 
             if (hasError) await Task.Delay(2000);
             await SetStatusAsync("Ready.", instance, token);
+            
+            return hasDiff;
         }
 
         public static Range.range MakeRange(SnapshotSpan vspan, string path)
@@ -254,7 +262,7 @@ namespace FantomasVs
             return range;
         }
 
-        public Task FormatAsync(EditorCommandArgs args, CommandExecutionContext context)
+        public Task<bool> FormatAsync(EditorCommandArgs args, CommandExecutionContext context)
         {
             var snapshot = args.TextView.TextSnapshot;
             var vspan = new SnapshotSpan(snapshot, new Span(0, snapshot.Length));
@@ -348,7 +356,15 @@ namespace FantomasVs
             if (!instance.Options.FormatOnSave)
                 return;
 
-            await FormatAsync(args, executionContext);
+            var hasDiff = await FormatAsync(args, executionContext);
+
+            if (!hasDiff)
+                return;
+
+            var buffer = args.SubjectBuffer;
+            var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
+
+            document?.Save();
         }
 
         #endregion
