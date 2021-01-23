@@ -235,13 +235,24 @@ namespace FantomasVs
         [Description("Runs through formatting code on startup to warm up the Jit. Reduces delay when first using it.")]
         public bool WarmUpOnStartup { get; set; } = false;
 
+        [Category("Performance")]
+        [DisplayName("Enable SpaceBar Heating")]
+        [Description("xkcd/1172")]
+        public bool EnableSpaceBarHeating { get; set; } = false;
+
         #endregion
 
         #region On Save
 
         [Category("On Save")]
         [DisplayName("Format On Save")]
+        [Description("This triggers a formatting whenever you hit save")]
         public bool FormatOnSave { get; set; } = false;
+
+        [Category("On Save")]
+        [DisplayName("Commit Changes")]
+        [Description("Set this to false if you don't want to commit formatting changes to the file unless you hit save once again")]
+        public bool CommitChanges { get; set; } = true;
 
         #endregion
     }

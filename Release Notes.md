@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+0.7.3
+----
+
+* Add options to allow to not commit changes caused by format-on-save
+
 0.7.2
 ----
 

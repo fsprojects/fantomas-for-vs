@@ -358,7 +358,7 @@ namespace FantomasVs
 
             var hasDiff = await FormatAsync(args, executionContext);
 
-            if (!hasDiff)
+            if (!hasDiff || !instance.Options.CommitChanges)
                 return;
 
             var buffer = args.SubjectBuffer;

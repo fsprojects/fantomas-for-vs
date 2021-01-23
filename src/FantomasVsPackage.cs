@@ -13,7 +13,7 @@ namespace FantomasVs
 
     // DO NOT REMOVE THIS MAGICAL INCANTATION NO MATTER HOW MUCH VS WARNS YOU OF DEPRECATION    
     // --------------------------------------------------------------------------------------
-    [InstalledProductRegistration("F# Formatting", "F# source code formatting using Fantomas.", "0.7.2", IconResourceID = 400)]
+    [InstalledProductRegistration("F# Formatting", "F# source code formatting using Fantomas.", "0.7.3", IconResourceID = 400)]
     // --------------------------------------------------------------------------------------
 
     // Package registration attributes
