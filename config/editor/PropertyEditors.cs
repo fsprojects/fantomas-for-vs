@@ -8,11 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace System.Runtime.CompilerServices
-{
-    internal static class IsExternalInit { }
-}
-
 namespace FantomasVs.Editor
 {
 
