@@ -23,7 +23,6 @@ namespace FantomasVs.Editor
 
         private RepeatButton UpButtonElement;
         private RepeatButton DownButtonElement;
-        private TextBox TextElement;
 
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register("Value", typeof(int), typeof(SpinControl), new PropertyMetadata());
@@ -35,7 +34,6 @@ namespace FantomasVs.Editor
 
             UpButtonElement = GetTemplateChild("PART_UpButton") as RepeatButton;
             DownButtonElement = GetTemplateChild("PART_DownButton") as RepeatButton;
-            TextElement = GetTemplateChild("PART_Text") as TextBox;
 
             if (UpButtonElement != null) UpButtonElement.Click += OnUpClick;
             if (DownButtonElement != null) DownButtonElement.Click += OnDownClick;

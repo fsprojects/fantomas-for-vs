@@ -69,7 +69,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="Int32Template">
-            <editor:SpinControl Value="{Binding Value}" />
+            <editor:SpinControl Value="{Binding Value, Mode=TwoWay}" />
         </DataTemplate>
 
         <DataTemplate x:Key="EnumTemplate">

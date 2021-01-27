@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
 using Fantomas;
+using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
 using System.Xml.Serialization;
 using EditorConfig.Core;
 
@@ -14,7 +15,7 @@ namespace FantomasVs
         public const string GuidString = "74927147-72e8-4b47-a70d-5568807d6878";
 
         public static FormatConfig.FormatConfig Defaults => FormatConfig.FormatConfig.Default;
-        
+
         #region Indent
 
         [Category("Indentation")]
@@ -29,10 +30,10 @@ namespace FantomasVs
         #endregion
 
         #region Elmish
-        
+
         [Category("Elmish")]
         [DisplayName("Disable for Elmish Syntax")]
-        public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax; 
+        public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax;
 
         #endregion
 
@@ -105,7 +106,7 @@ namespace FantomasVs
 
         [Category("Boundaries")]
         [DisplayName("MultiLine Lambda Closing Newline")]
-        public bool MultiLineLambdaClosingNewline  { get; set; } = Defaults.MultiLineLambdaClosingNewline;
+        public bool MultiLineLambdaClosingNewline { get; set; } = Defaults.MultiLineLambdaClosingNewline;
 
         [Category("Boundaries")]
         [DisplayName("Multiline Block Brackets On Same Column")]
@@ -255,5 +256,55 @@ namespace FantomasVs
         public bool CommitChanges { get; set; } = true;
 
         #endregion
+
+        public FantomasConfig ToOptions(int? spaces)
+        {
+
+            var config = new FantomasConfig(
+                indentSize: spaces ?? this.IndentSize,
+                indentOnTryWith: this.IndentOnTryWith,
+
+                disableElmishSyntax: this.DisableElmishSyntax,
+                maxArrayOrListWidth: this.MaxArrayOrListWidth,
+                maxElmishWidth: this.MaxElmishWidth,
+                maxFunctionBindingWidth: this.MaxFunctionBindingWidth,
+                maxValueBindingWidth: this.MaxValueBindingWidth,
+                maxIfThenElseShortWidth: this.MaxIfThenElseShortWidth,
+                maxInfixOperatorExpression: this.MaxInfixOperatorExpression,
+                maxLineLength: this.MaxLineLength,
+                maxRecordWidth: this.MaxRecordWidth,
+                maxRecordNumberOfItems: this.MaxRecordNumberOfItems,
+                multilineBlockBracketsOnSameColumn: this.MultilineBlockBracketsOnSameColumn,
+                recordMultilineFormatter: this.RecordMultilineFormatter,
+                arrayOrListMultilineFormatter: this.ArrayOrListMultilineFormatter,
+                maxArrayOrListNumberOfItems: this.MaxArrayOrListNumberOfItems,
+                maxDotGetExpressionWidth: this.MaxDotGetExpressionWidth,
+                keepIfThenInSameLine: this.KeepIfThenInSameLine,
+                singleArgumentWebMode: this.SingleArgumentWebMode,
+                alignFunctionSignatureToIndentation: this.AlignFunctionSignatureToIndentation,
+                alternativeLongMemberDefinitions: this.AlternativeLongMemberDefinitions,
+                multiLineLambdaClosingNewline: this.MultiLineLambdaClosingNewline,
+                endOfLine: this.EndOfLine,
+
+                semicolonAtEndOfLine: this.SemicolonAtEndOfLine,
+
+                spaceBeforeClassConstructor: this.SpaceBeforeClassConstructor,
+                spaceBeforeLowercaseInvocation: this.SpaceBeforeLowercaseInvocation,
+                spaceBeforeUppercaseInvocation: this.SpaceBeforeUppercaseInvocation,
+                spaceBeforeMember: this.SpaceBeforeMember,
+                spaceBeforeParameter: this.SpaceBeforeParameter,
+                spaceBeforeColon: this.SpaceBeforeColon,
+                spaceAfterComma: this.SpaceAfterComma,
+                spaceAfterSemicolon: this.SpaceAfterSemicolon,
+                spaceBeforeSemicolon: this.SpaceBeforeSemicolon,
+                spaceAroundDelimiter: this.SpaceAroundDelimiter,
+
+                newlineBetweenTypeDefinitionAndMembers: this.NewlineBetweenTypeDefinitionAndMembers,
+
+                strictMode: this.StrictMode
+            );
+
+            return config;
+        }
     }
 }

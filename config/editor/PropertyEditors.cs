@@ -19,7 +19,9 @@ namespace FantomasVs.Editor
         string CustomEditorTemplate { get; set; }
         object BoxedValue { get; set; }
         PropertyInfo SourceProperty { get; set; }
-        public object Target { get; set; }
+        object Target { get; set; }
+
+        event EventHandler ValueChanged;
     }
 
     public class PropertyEditor<TValue> : IPropertyEditor
@@ -56,10 +58,16 @@ namespace FantomasVs.Editor
             set { BoxedValue = value; OnPropertyChanged(); }
         }
 
+        public event EventHandler ValueChanged;
+
         public object BoxedValue
         {
             get => SourceProperty.GetValue(Target);
-            set => SourceProperty.SetValue(Target, value);
+            set
+            {
+                SourceProperty.SetValue(Target, value); 
+                ValueChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public string ErrorMessage { get; set; } = "This value is invalid";
@@ -99,8 +107,7 @@ namespace FantomasVs.Editor
 
     public class EditorTemplateSelector : DataTemplateSelector
     {
-        public override DataTemplate
-            SelectTemplate(object item, DependencyObject container)
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (container is FrameworkElement element && item is IPropertyEditor editor)
             {
@@ -122,6 +129,7 @@ namespace FantomasVs.Editor
 
         public ObservableCollection<IPropertyEditor> Editors { get; }
 
+        public event Action<string> PropertyEdited;
 
         public CollectionView View { get; }
 
@@ -149,9 +157,20 @@ namespace FantomasVs.Editor
             var properties = typeof(TOpt).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             Editors = new ObservableCollection<IPropertyEditor>(properties.Where(CanCreateEditor).Select(CreateEditor));
 
+            foreach (var editor in Editors)
+            {
+                editor.ValueChanged += OnValueChanged;
+            }
+
             View = (CollectionView)CollectionViewSource.GetDefaultView(Editors);
             View.GroupDescriptions.Add(new PropertyGroupDescription(nameof(IPropertyEditor.Category)));
             View.Filter = IsMatching;
+        }
+
+        private void OnValueChanged(object sender, EventArgs e)
+        {
+            var editor = (IPropertyEditor)sender;
+            PropertyEdited?.Invoke(editor.SourceProperty.Name);
         }
 
         protected virtual bool IsMatching(object obj)

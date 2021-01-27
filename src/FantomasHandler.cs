@@ -52,52 +52,7 @@ namespace FantomasVs
         {
             var localOptions = args.TextView.Options;
             var indentSpaces = localOptions?.GetIndentSize();
-
-            var config = new FantomasConfig(
-                indentSize: indentSpaces ?? fantopts.IndentSize,
-                indentOnTryWith: fantopts.IndentOnTryWith,
-
-                disableElmishSyntax: fantopts.DisableElmishSyntax,
-                maxArrayOrListWidth: fantopts.MaxArrayOrListWidth,
-                maxElmishWidth: fantopts.MaxElmishWidth,
-                maxFunctionBindingWidth: fantopts.MaxFunctionBindingWidth,
-                maxValueBindingWidth: fantopts.MaxValueBindingWidth,
-                maxIfThenElseShortWidth: fantopts.MaxIfThenElseShortWidth,
-                maxInfixOperatorExpression: fantopts.MaxInfixOperatorExpression,
-                maxLineLength: fantopts.MaxLineLength,
-                maxRecordWidth: fantopts.MaxRecordWidth,
-                maxRecordNumberOfItems: fantopts.MaxRecordNumberOfItems,
-                multilineBlockBracketsOnSameColumn: fantopts.MultilineBlockBracketsOnSameColumn,
-                recordMultilineFormatter: fantopts.RecordMultilineFormatter,
-                arrayOrListMultilineFormatter: fantopts.ArrayOrListMultilineFormatter,
-                maxArrayOrListNumberOfItems: fantopts.MaxArrayOrListNumberOfItems,
-                maxDotGetExpressionWidth: fantopts.MaxDotGetExpressionWidth,
-                keepIfThenInSameLine: fantopts.KeepIfThenInSameLine,
-                singleArgumentWebMode: fantopts.SingleArgumentWebMode,
-                alignFunctionSignatureToIndentation: fantopts.AlignFunctionSignatureToIndentation,
-                alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
-                multiLineLambdaClosingNewline: fantopts.MultiLineLambdaClosingNewline,
-                endOfLine: fantopts.EndOfLine,
-
-                semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
-
-                spaceBeforeClassConstructor: fantopts.SpaceBeforeClassConstructor,
-                spaceBeforeLowercaseInvocation: fantopts.SpaceBeforeLowercaseInvocation,
-                spaceBeforeUppercaseInvocation: fantopts.SpaceBeforeUppercaseInvocation,
-                spaceBeforeMember: fantopts.SpaceBeforeMember,
-                spaceBeforeParameter: fantopts.SpaceBeforeParameter,
-                spaceBeforeColon: fantopts.SpaceBeforeColon,
-                spaceAfterComma: fantopts.SpaceAfterComma,
-                spaceAfterSemicolon: fantopts.SpaceAfterSemicolon,
-                spaceBeforeSemicolon: fantopts.SpaceBeforeSemicolon,
-                spaceAroundDelimiter: fantopts.SpaceAroundDelimiter,
-
-                newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
-
-                strictMode: fantopts.StrictMode
-            );
-
-            return config;
+            return fantopts.ToOptions(indentSpaces);
         }
 
         #endregion
