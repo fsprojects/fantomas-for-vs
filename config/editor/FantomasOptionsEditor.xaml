@@ -4,26 +4,99 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:highlighting="clr-namespace:FSharp.Highlighting;assembly=FSharp.Highlighting"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:editor="clr-namespace:FantomasVs.Editor"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d"
     >
+    <UserControl.Resources>
+        <editor:EditorTemplateSelector x:Key="editorSelector" />
+        <Style x:Key="EnableToggle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                Padding="{TemplateBinding Padding}" 
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="3">
+                            <TextBlock Text="{TemplateBinding Content}" 
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                       FontFamily="Consolas" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Content" Value="Disabled" />
+            <Setter Property="Background" Value="#FFEEEEEE" />
+            <Setter Property="BorderBrush" Value="#FFAAAAAA" />
+            <Setter Property="Padding" Value="4" />
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Content" Value="Enabled" />
+                    <Setter Property="Background" Value="#FF7FDAD5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type editor:SpinControl}">
+            <Style.Resources>
+                <Style x:Key="UpDown" TargetType="{x:Type RepeatButton}">
+                    <Setter Property="Width" Value="20" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="BorderBrush" Value="Gray" />                    
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
+            </Style.Resources>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="editor:SpinControl">
+                        <StackPanel Orientation="Horizontal">
+                            <RepeatButton Name="PART_DownButton" Style="{StaticResource UpDown}">-</RepeatButton>
+                            <TextBox Name="PART_Text" Text="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                 AncestorType={x:Type editor:SpinControl}}, 
+                                 Path=Value, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas" Padding="4" Width="30" BorderThickness="0,1" />
+                            <RepeatButton Name="PART_UpButton" Style="{StaticResource UpDown}">+</RepeatButton>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="BooleanTemplate">
+            <ToggleButton Style="{StaticResource EnableToggle}" IsChecked="{Binding Value}" Width="70" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="Int32Template">
+            <editor:SpinControl Value="{Binding Value}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="EnumTemplate">
+            <ComboBox SelectedValue="{Binding Value}" 
+                      ItemsSource="{Binding Values}" 
+                      DisplayMemberPath="Label" 
+                      SelectedValuePath="Value"
+                      MinWidth="70" 
+                      Padding="4"/>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="40" />
+            <RowDefinition Height="34" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Background="#FFF1F1F1">
+        <!--<Grid Background="#FFF1F1F1">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="140"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock
+            -->
+        <!--<TextBlock
                 VerticalAlignment="Center"
                 Margin="4"
                 Text="Displays settings as defined in the .editorconfig or if no settings can be found the user profile's formatting options."
@@ -31,19 +104,60 @@
 
             <Button Margin="4" Grid.Column="1">
                 <TextBlock>Generate <Span FontStyle="Italic">.editorconfig</Span></TextBlock>
-            </Button>
+            </Button>-->
+        <!--
+            <Label VerticalAlignment="Center">Search</Label>
+            <TextBox Text="{Binding SearchText}" Margin="4" Grid.Column="1" />
+        </Grid>-->
+
+        <Grid>
+            <TextBox x:Name="SearchTermTextBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="4" VerticalContentAlignment="Center"/>
+            <TextBlock IsHitTestVisible="False" Text="Search Here" VerticalAlignment="Center" Margin="10,0" Opacity="0.5">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=SearchTermTextBox}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </Grid>
 
 
-        <ListView Grid.Row="1">
-            <!--  Here goes options  -->
+        <ListView x:Name="PropertyView" Grid.Row="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Property" Width="Auto" DisplayMemberBinding="{Binding DisplayName}" />
+                    <GridViewColumn Header="Value" Width="Auto" CellTemplateSelector="{StaticResource editorSelector}" />
+                </GridView>
+            </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="True" Header="{Binding Name}">
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
         </ListView>
-        
+
         <GridSplitter Grid.Row="1" Height="3" Background="#FF2B46C1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" ShowsPreview="True" />
-        
+
         <Border Grid.Row="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <highlighting:Highlighter SourceText="let x = 10" Padding="8" Background="White" />
+                <highlighting:Highlighter x:Name="SourcePreview" SourceText="let x = 10" Padding="8" Background="White" />
             </ScrollViewer>
         </Border>
 
