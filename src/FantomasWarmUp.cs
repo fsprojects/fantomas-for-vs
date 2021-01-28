@@ -1,12 +1,10 @@
-﻿using Fantomas;
+﻿extern alias FantomasLatest;
+
+using FantomasLatest::Fantomas;
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
-using Microsoft.VisualStudio.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FantomasVs

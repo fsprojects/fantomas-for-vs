@@ -121,6 +121,7 @@
     <ProjectReference Include="Fantomas\Fantomas.fsproj">
       <Project>{a96fc3fb-ad45-4420-878d-78e63e3fb137}</Project>
       <Name>Fantomas</Name>
+      <Aliases>FantomasLatest</Aliases>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

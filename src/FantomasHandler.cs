@@ -1,4 +1,6 @@
-﻿using System;
+﻿extern alias FantomasLatest;
+
+using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -16,10 +18,11 @@ using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
-using Fantomas;
+
+using FantomasLatest::Fantomas;
 using Task = System.Threading.Tasks.Task;
-using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
-using FantomasEditorConfig = Fantomas.Extras.EditorConfig;
+using FantomasConfig = FantomasLatest::Fantomas.FormatConfig.FormatConfig;
+using FantomasEditorConfig = FantomasLatest::Fantomas.Extras.EditorConfig;
 using FSharp.Compiler;
 
 namespace FantomasVs

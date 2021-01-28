@@ -1,10 +1,11 @@
-﻿using System;
+﻿extern alias FantomasLatest;
+
+using System;
 using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
-using Fantomas;
-using System.Xml.Serialization;
-using EditorConfig.Core;
+using FantomasLatest::Fantomas;
+using FantomasConfig = FantomasLatest::Fantomas.FormatConfig.FormatConfig;
 
 namespace FantomasVs
 {
