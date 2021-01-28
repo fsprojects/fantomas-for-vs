@@ -1,4 +1,5 @@
 ﻿extern alias FantomasLatest;
+extern alias FantomasStable;
 
 using System;
 using DiffPlex;
