@@ -22,10 +22,10 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
-using CodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
-using FantomasConfig = FantomasLatest::Fantomas.FormatConfig.FormatConfig;
-using FantomasEditorConfig = FantomasLatest::Fantomas.Extras.EditorConfig;
-using SourceOrigin = FantomasLatest::Fantomas.SourceOrigin.SourceOrigin;
+using CodeFormatter = FantomasStable::Fantomas.CodeFormatter;
+using FantomasConfig = FantomasStable::Fantomas.FormatConfig.FormatConfig;
+using FantomasEditorConfig = Fantomas.Extras.EditorConfig;
+using SourceOrigin = FantomasStable::Fantomas.SourceOrigin.SourceOrigin;
 using FSharp.Compiler;
 
 namespace FantomasVs

@@ -1,11 +1,12 @@
 ﻿extern alias FantomasLatest;
+extern alias FantomasStable;
 
 using System;
 using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
-using FantomasLatest::Fantomas;
-using FantomasConfig = FantomasLatest::Fantomas.FormatConfig.FormatConfig;
+using FantomasConfig = FantomasLatest::Fantomas.FormatConfig;
+using FormatConfig = FantomasStable::Fantomas.FormatConfig;
 
 namespace FantomasVs
 {
