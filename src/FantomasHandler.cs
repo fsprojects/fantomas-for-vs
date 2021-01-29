@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
+
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.VisualStudio.Commanding;
@@ -20,10 +22,10 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
-using FantomasLatest::Fantomas;
-using Task = System.Threading.Tasks.Task;
+using CodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
 using FantomasConfig = FantomasLatest::Fantomas.FormatConfig.FormatConfig;
 using FantomasEditorConfig = FantomasLatest::Fantomas.Extras.EditorConfig;
+using SourceOrigin = FantomasLatest::Fantomas.SourceOrigin.SourceOrigin;
 using FSharp.Compiler;
 
 namespace FantomasVs
@@ -203,7 +205,7 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 };
 
-                var origin = SourceOrigin.SourceOrigin.NewSourceString(originText);
+                var origin = SourceOrigin.NewSourceString(originText);
 
 
                 var fsasync = kind switch
