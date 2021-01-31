@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Version>1.0</Version>
+    <Description>Source code formatter for F#</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\SourceOrigin.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\FormatConfig.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas.Extras\EditorConfig.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="editorconfig" Version="0.12.2" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="38.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.0" />
+  </ItemGroup>
+</Project>
