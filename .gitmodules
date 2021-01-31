@@ -1,4 +1,9 @@
-[submodule "fantomas"]
-	path = fantomas
+[submodule "fantomas-latest"]
+	path = fantomas-latest
+	url = https://github.com/fsprojects/fantomas.git
+	branch = master
+
+[submodule "fantomas-stable"]
+	path = fantomas-stable
 	url = https://github.com/fsprojects/fantomas.git
 	branch = master
