@@ -5,8 +5,8 @@ using System;
 using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
-using FantomasConfig = FantomasLatest::Fantomas.FormatConfig;
-using FormatConfig = FantomasStable::Fantomas.FormatConfig;
+using FormatConfig = Fantomas.FormatConfig;
+
 
 namespace FantomasVs
 {
@@ -255,6 +255,21 @@ namespace FantomasVs
         [DisplayName("Commit Changes")]
         [Description("Set this to false if you don't want to commit formatting changes to the file unless you hit save once again")]
         public bool CommitChanges { get; set; } = true;
+
+        #endregion
+
+        #region Version
+
+        public enum Version
+        {
+            Stable,
+            Latest
+        }
+
+        [Category("Formatter Version")]
+        [DisplayName("Build Version")]
+        [Description("Select latest if you want bleeding edge features and hotfixes, Stable is the last stable release.")]
+        public Version BuildVersion { get; set; } = Version.Stable;
 
         #endregion
     }
