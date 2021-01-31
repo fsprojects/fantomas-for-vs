@@ -1,5 +1,6 @@
 ﻿extern alias FantomasLatest;
 
+using Fantomas;
 using FantomasLatest::Fantomas;
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;

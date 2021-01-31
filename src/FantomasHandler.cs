@@ -1,6 +1,15 @@
 ﻿extern alias FantomasLatest;
 extern alias FantomasStable;
 
+using StableCodeFormatter = FantomasStable::Fantomas.CodeFormatter;
+using LatestCodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
+
+using SourceOrigin = Fantomas.SourceOrigin.SourceOrigin;
+using EditorConfig = Fantomas.Extras.EditorConfig;
+using FormatConfig = Fantomas.FormatConfig;
+
+
+
 using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
@@ -22,11 +31,8 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
-using CodeFormatter = FantomasStable::Fantomas.CodeFormatter;
-using FantomasConfig = FantomasStable::Fantomas.FormatConfig.FormatConfig;
-using FantomasEditorConfig = Fantomas.Extras.EditorConfig;
-using SourceOrigin = FantomasStable::Fantomas.SourceOrigin.SourceOrigin;
 using FSharp.Compiler;
+using Microsoft.FSharp.Core;
 
 namespace FantomasVs
 {
@@ -54,12 +60,13 @@ namespace FantomasVs
 
         #region Build Options
 
-        protected FantomasConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
+   
+        protected FormatConfig.FormatConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
         {
             var localOptions = args.TextView.Options;
             var indentSpaces = localOptions?.GetIndentSize();
 
-            var config = new FantomasConfig(
+            var config = new FormatConfig.FormatConfig(
                 indentSize: indentSpaces ?? fantopts.IndentSize,
                 indentOnTryWith: fantopts.IndentOnTryWith,
 
@@ -105,6 +112,7 @@ namespace FantomasVs
 
             return config;
         }
+
 
         #endregion
 
@@ -191,7 +199,8 @@ namespace FantomasVs
             );
 
             var checker = CheckerInstance;
-            var config = (FantomasEditorConfig.tryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
+            var isLatest = fantopts.BuildVersion == FantomasOptionsPage.Version.Latest;
+            var config = (Fantomas.Extras.EditorConfig.tryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
 
             var hasError = false;
 
@@ -205,14 +214,21 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 };
 
+                
                 var origin = SourceOrigin.NewSourceString(originText);
-
-
                 var fsasync = kind switch
                 {
-                    FormatKind.Document => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
-                    FormatKind.Selection => CodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
-                    FormatKind.IsolatedSelection => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+                    FormatKind.Document or FormatKind.IsolatedSelection =>
+                        isLatest ?
+                        LatestCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker)
+                        :
+                        StableCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+
+                    FormatKind.Selection => 
+                        isLatest ?
+                        LatestCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker)
+                        :
+                        StableCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
                     _ => throw new NotSupportedException()
                 };
 
@@ -264,7 +280,7 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            var range = CodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            var range = StableCodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
             return range;
         }
 
