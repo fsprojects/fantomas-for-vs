@@ -1,6 +1,13 @@
 Release Notes
 ============
 
+0.8
+----
+
+* Change project build structure
+* Support both latest (bleeding edge) and stable versions configurable by an option
+* Update Fantomas to 4.4.0-beta-003 
+
 0.7.3
 ----
 
@@ -17,6 +24,7 @@ Release Notes
 ----
 
 * Fantomas Bugfix release
+* Fantomas 4.3
 
 0.7
 ----
