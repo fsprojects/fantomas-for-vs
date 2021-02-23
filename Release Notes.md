@@ -1,6 +1,12 @@
 Release Notes
 ============
 
+0.8.1
+----
+
+* Formatting defaults to stable version
+* Update Fantomas to 4.4.0-beta-008
+
 0.8
 ----
 
