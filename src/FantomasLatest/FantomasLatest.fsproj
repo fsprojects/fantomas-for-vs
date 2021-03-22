@@ -30,7 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="editorconfig" Version="0.12.2" />
-    <PackageReference Include="FSharp.Compiler.Service" Version="38.0.2" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="39.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FantomasCommon\FantomasCommon.fsproj" />
