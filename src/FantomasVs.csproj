@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="FantomasHandler.cs" />
     <Compile Include="FantomasWarmUp.cs" />
+    <Compile Include="CustomLineChunker.cs" />
     <Compile Include="PredefinedCommandHandlerNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FantomasVsPackage.cs" />

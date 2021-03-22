@@ -132,25 +132,38 @@ namespace FantomasVs
             var snapshot = buffer.CurrentSnapshot;
 
             using var edit = buffer.CreateEdit();
-            var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, new DiffPlex.Chunkers.LineEndingsPreservingChunker());
+            var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, AgnosticChunker.Instance);
             var lineOffset = snapshot.GetLineNumberFromPosition(span.Start);
 
             foreach (var current in diff.DiffBlocks)
             {
                 var start = lineOffset + current.DeleteStartA;
 
-                for (int i = 0; i < current.DeleteCountA; i++)
+                if (current.DeleteCountA == current.InsertCountB)
                 {
-                    var ln = snapshot.GetLineFromLineNumber(start + i);
-                    edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
-                }
-
-                for (int i = 0; i < current.InsertCountB; i++)
-                {
+                    var count = current.InsertCountB;
                     var ln = snapshot.GetLineFromLineNumber(start);
-                    edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
+                    var lne = snapshot.GetLineFromLineNumber(start + count);
+                    var lstart = ln.Start.Position;
+                    var lend = lne.Start.Position;
+                    var segments = new ArraySegment<string>(diff.PiecesNew, current.InsertStartB, current.InsertCountB);
+                    edit.Replace(lstart, lend - lstart, String.Join("", segments));
                 }
+                else
+                {
 
+                    for (int i = 0; i < current.DeleteCountA; i++)
+                    {
+                        var ln = snapshot.GetLineFromLineNumber(start + i);
+                        edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
+                    }
+
+                    for (int i = 0; i < current.InsertCountB; i++)
+                    {
+                        var ln = snapshot.GetLineFromLineNumber(start);
+                        edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
+                    }
+                }
             }
 
             edit.Apply();
@@ -200,7 +213,8 @@ namespace FantomasVs
 
             var checker = CheckerInstance;
             var isLatest = fantopts.BuildVersion == FantomasOptionsPage.Version.Latest;
-            var config = (Fantomas.Extras.EditorConfig.tryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
+            var editorConfig = Fantomas.Extras.EditorConfig.tryReadConfiguration(path);
+            var config = (editorConfig ?? GetOptions(args, fantopts)).Value;
 
             var hasError = false;
 
@@ -391,5 +405,5 @@ namespace FantomasVs
 
         #endregion
     }
-
 }
+
