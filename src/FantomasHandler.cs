@@ -127,6 +127,33 @@ namespace FantomasVs
             return true;
         }
 
+        private (int, int) ShrinkDiff(string currentText, string replaceWith)
+        {
+            int startOffset = 0, endOffset = 0;
+            var currentLength = currentText.Length;
+            var replaceLength = replaceWith.Length;
+
+            var length = Math.Min(currentLength, replaceLength);
+
+            for (int i = 0; i < length; i++)
+            {
+                if (currentText[i] == replaceWith[i])
+                    startOffset++;
+                else
+                    break;
+            }
+
+            for (int i = startOffset + 1; i < length; i++)
+            {
+                if (currentText[currentLength - i] == replaceWith[replaceLength - i])
+                    endOffset++;
+                else
+                    break;
+            }
+
+            return (startOffset, endOffset);
+        }
+
         protected bool DiffPatch(Span span, ITextBuffer buffer, string oldText, string newText)
         {
             var snapshot = buffer.CurrentSnapshot;
@@ -142,12 +169,18 @@ namespace FantomasVs
                 if (current.DeleteCountA == current.InsertCountB)
                 {
                     var count = current.InsertCountB;
-                    var ln = snapshot.GetLineFromLineNumber(start);
-                    var lne = snapshot.GetLineFromLineNumber(start + count);
-                    var lstart = ln.Start.Position;
-                    var lend = lne.Start.Position;
-                    var segments = new ArraySegment<string>(diff.PiecesNew, current.InsertStartB, current.InsertCountB);
-                    edit.Replace(lstart, lend - lstart, String.Join("", segments));
+                    var lstart = snapshot.GetLineFromLineNumber(start).Start.Position;
+                    var lend = snapshot.GetLineFromLineNumber(start + count).Start.Position;
+                    var currentText = snapshot.GetText(lstart, lend - lstart);
+                    var replaceWith = count == 1 ? 
+                            diff.PiecesNew[current.InsertStartB] : 
+                            string.Join("", diff.PiecesNew, current.InsertStartB, current.InsertCountB);
+                    var (startOffset, endOffset) = ShrinkDiff(currentText, replaceWith);
+                    var totalOffset = startOffset + endOffset;
+
+                    var minReplaceWith = replaceWith.Substring(startOffset, replaceWith.Length - totalOffset);
+
+                    edit.Replace(lstart + startOffset, Math.Max(0, lend - lstart - totalOffset), minReplaceWith);
                 }
                 else
                 {
@@ -170,6 +203,7 @@ namespace FantomasVs
             
             return diff.DiffBlocks.Any();
         }
+
         #endregion
 
 
