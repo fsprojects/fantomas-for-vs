@@ -143,8 +143,11 @@ namespace FantomasVs
                     break;
             }
 
-            for (int i = startOffset + 1; i < length; i++)
+            for (int i = 1; i < length; i++)
             {
+                if ((startOffset + endOffset) >= length)
+                    break;
+
                 if (currentText[currentLength - i] == replaceWith[replaceLength - i])
                     endOffset++;
                 else
