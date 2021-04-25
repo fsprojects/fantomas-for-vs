@@ -33,7 +33,7 @@ namespace FantomasVs
         /// </summary>
         public const string PackageGuidString = "74927147-72e8-4b47-a80d-5568807d6878";
 
-        private static TaskCompletionSource<FantomasVsPackage> _instance = new TaskCompletionSource<FantomasVsPackage>();
+        private static readonly TaskCompletionSource<FantomasVsPackage> _instance = new();
         public static Task<FantomasVsPackage> Instance => _instance.Task;
 
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();

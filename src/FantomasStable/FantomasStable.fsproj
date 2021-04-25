@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <Version>4.3.0</Version>
+    <Version>4.4.0</Version>
     <Description>Source code formatter for F#</Description>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
@@ -30,12 +30,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="editorconfig" Version="0.12.2" />
-    <PackageReference Include="FSharp.Compiler.Service" Version="38.0.2" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="39.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FantomasCommon\FantomasCommon.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="5.0.0" />
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
   </ItemGroup>
 </Project>

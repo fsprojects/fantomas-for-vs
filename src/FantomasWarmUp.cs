@@ -59,7 +59,7 @@ shuffle (deck |> List.toArray)
         {
             try
             {
-                var fsasync = CodeFormatter.FormatDocumentAsync("tmp.fs", SourceOrigin.SourceOrigin.NewSourceString(SampleCode), FormatConfig.FormatConfig.Default, FSharpParsingOptions.Default, FSharpChecker.Create(null, null, null, null, null, null, null, null));
+                var fsasync = CodeFormatter.FormatDocumentAsync("tmp.fs", SourceOrigin.SourceOrigin.NewSourceString(SampleCode), FormatConfig.FormatConfig.Default, FSharpParsingOptions.Default, FSharpChecker.Create(null, null, null, null, null, null, null, null, null));
                 var _ = await FSharpAsync.StartAsTask(fsasync, null, null);
             }
             catch (Exception ex)

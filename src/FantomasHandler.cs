@@ -33,6 +33,7 @@ using Microsoft.VisualStudio.Threading;
 
 using FSharp.Compiler;
 using Microsoft.FSharp.Core;
+using FSharp.Compiler.Text;
 
 namespace FantomasVs
 {
@@ -50,8 +51,8 @@ namespace FantomasVs
 
         #region Checker
 
-        private readonly Lazy<FSharpChecker> _checker = new Lazy<FSharpChecker>(() =>
-            FSharpChecker.Create(null, null, null, null, null, null, null, null)
+        private readonly Lazy<FSharpChecker> _checker = new(() =>
+            FSharpChecker.Create(null, null, null, null, null, null, null, null, null)
         );
 
         protected FSharpChecker CheckerInstance => _checker.Value;
@@ -69,6 +70,7 @@ namespace FantomasVs
             var config = new FormatConfig.FormatConfig(
                 indentSize: indentSpaces ?? fantopts.IndentSize,
                 indentOnTryWith: fantopts.IndentOnTryWith,
+                keepIndentInBranch: fantopts.KeepIndentInBranch,
 
                 disableElmishSyntax: fantopts.DisableElmishSyntax,
                 maxArrayOrListWidth: fantopts.MaxArrayOrListWidth,
@@ -91,6 +93,7 @@ namespace FantomasVs
                 alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
                 multiLineLambdaClosingNewline: fantopts.MultiLineLambdaClosingNewline,
                 endOfLine: fantopts.EndOfLine,
+                blankLinesAroundNestedMultilineExpressions: fantopts.BlankLinesAroundNestedMultilineExpressions,
 
                 semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
 
@@ -319,7 +322,7 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        public static Range.range MakeRange(SnapshotSpan vspan, string path)
+        public static Range MakeRange(SnapshotSpan vspan, string path)
         {
             // Beware that the range argument is inclusive. 
             // If the range has a trailing newline, it will appear in the formatted result.

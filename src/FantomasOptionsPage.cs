@@ -28,10 +28,16 @@ namespace FantomasVs
         [Description("This will normally be set by the editor, this is the value to fallback to.")]
         public int IndentSize { get; set; } = Defaults.IndentSize;
 
+
+        [Category("Indentation")]
+        [DisplayName("Keep Indent in Branch")]
+        public bool KeepIndentInBranch { get; set; } = Defaults.KeepIndentInBranch;
+
+
         #endregion
 
         #region Elmish
-        
+
         [Category("Elmish")]
         [DisplayName("Disable for Elmish Syntax")]
         public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax; 
@@ -108,6 +114,10 @@ namespace FantomasVs
         [Category("Boundaries")]
         [DisplayName("MultiLine Lambda Closing Newline")]
         public bool MultiLineLambdaClosingNewline  { get; set; } = Defaults.MultiLineLambdaClosingNewline;
+
+        [Category("Boundaries")]
+        [DisplayName("Blank Lines Around Nested Multiline Expressions")]
+        public bool BlankLinesAroundNestedMultilineExpressions { get; set; } = Defaults.BlankLinesAroundNestedMultilineExpressions;
 
         [Category("Boundaries")]
         [DisplayName("Multiline Block Brackets On Same Column")]
