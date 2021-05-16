@@ -61,7 +61,7 @@ namespace FantomasVs
 
         #region Build Options
 
-   
+
         protected FormatConfig.FormatConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
         {
             var localOptions = args.TextView.Options;
@@ -123,9 +123,9 @@ namespace FantomasVs
 
         protected bool ReplaceAll(Span span, ITextBuffer buffer, string oldText, string newText)
         {
-            if(oldText == newText)
+            if (oldText == newText)
                 return false;
-            
+
             buffer.Replace(span, newText);
             return true;
         }
@@ -168,18 +168,25 @@ namespace FantomasVs
             var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, AgnosticChunker.Instance);
             var lineOffset = snapshot.GetLineNumberFromPosition(span.Start);
 
+            int StartOf(int line) =>
+                snapshot
+                .GetLineFromLineNumber(line)
+                .Start
+                .Position;
+
             foreach (var current in diff.DiffBlocks)
             {
                 var start = lineOffset + current.DeleteStartA;
 
-                if (current.DeleteCountA == current.InsertCountB)
+                if (current.DeleteCountA == current.InsertCountB &&
+                   (current.DeleteStartA + current.DeleteCountA) < snapshot.LineCount)
                 {
                     var count = current.InsertCountB;
-                    var lstart = snapshot.GetLineFromLineNumber(start).Start.Position;
-                    var lend = snapshot.GetLineFromLineNumber(start + count).Start.Position;
+                    var lstart = StartOf(start);
+                    var lend = StartOf(start + count);
                     var currentText = snapshot.GetText(lstart, lend - lstart);
-                    var replaceWith = count == 1 ? 
-                            diff.PiecesNew[current.InsertStartB] : 
+                    var replaceWith = count == 1 ?
+                            diff.PiecesNew[current.InsertStartB] :
                             string.Join("", diff.PiecesNew, current.InsertStartB, current.InsertCountB);
                     var (startOffset, endOffset) = ShrinkDiff(currentText, replaceWith);
                     var totalOffset = startOffset + endOffset;
@@ -206,7 +213,7 @@ namespace FantomasVs
             }
 
             edit.Apply();
-            
+
             return diff.DiffBlocks.Any();
         }
 
@@ -268,7 +275,7 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 };
 
-                
+
                 var origin = SourceOrigin.NewSourceString(originText);
                 var fsasync = kind switch
                 {
@@ -278,7 +285,7 @@ namespace FantomasVs
                         :
                         StableCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
 
-                    FormatKind.Selection => 
+                    FormatKind.Selection =>
                         isLatest ?
                         LatestCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker)
                         :
@@ -318,7 +325,7 @@ namespace FantomasVs
 
             if (hasError) await Task.Delay(2000);
             await SetStatusAsync("Ready.", instance, token);
-            
+
             return hasDiff;
         }
 
