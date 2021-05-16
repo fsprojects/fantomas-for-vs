@@ -1,4 +1,7 @@
-﻿using System;
+﻿extern alias FantomasLatest;
+extern alias FantomasStable;
+
+using System;
 using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
 using System.Runtime.InteropServices;
@@ -26,6 +29,12 @@ namespace FantomasVs
         [DisplayName("Indent Number of Spaces")]
         [Description("This will normally be set by the editor, this is the value to fallback to.")]
         public int IndentSize { get; set; } = Defaults.IndentSize;
+
+
+        [Category("Indentation")]
+        [DisplayName("Keep Indent in Branch")]
+        public bool KeepIndentInBranch { get; set; } = Defaults.KeepIndentInBranch;
+
 
         #endregion
 
@@ -107,6 +116,10 @@ namespace FantomasVs
         [Category("Boundaries")]
         [DisplayName("MultiLine Lambda Closing Newline")]
         public bool MultiLineLambdaClosingNewline { get; set; } = Defaults.MultiLineLambdaClosingNewline;
+
+        [Category("Boundaries")]
+        [DisplayName("Blank Lines Around Nested Multiline Expressions")]
+        public bool BlankLinesAroundNestedMultilineExpressions { get; set; } = Defaults.BlankLinesAroundNestedMultilineExpressions;
 
         [Category("Boundaries")]
         [DisplayName("Multiline Block Brackets On Same Column")]

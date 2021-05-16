@@ -1,6 +1,36 @@
 Release Notes
 ============
 
+0.8.4
+----
+
+* Implement diff shrinking for minimal edit surface
+
+0.8.3
+----
+
+* Unix line-endings supported with diff
+* Implement line-ending agnostic chunker
+
+0.8.2
+----
+
+* Update stable Fantomas to 4.4.0
+* Update latest to 4.5.0 alpha
+
+0.8.1
+----
+
+* Formatting defaults to stable version
+* Update Fantomas to 4.4.0-beta-008
+
+0.8
+----
+
+* Change project build structure
+* Support both latest (bleeding edge) and stable versions configurable by an option
+* Update Fantomas to 4.4.0-beta-003 
+
 0.7.3
 ----
 
@@ -17,6 +47,7 @@ Release Notes
 ----
 
 * Fantomas Bugfix release
+* Fantomas 4.3
 
 0.7
 ----

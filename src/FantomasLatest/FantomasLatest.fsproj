@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Version>4.5.0</Version>
+    <Description>Source code formatter for F#</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\AssemblyInfo.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Version.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\RangeHelpers.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\AstExtensions.fs" Link="AstExtensions.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Dbg.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Utils.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Queue.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\TriviaTypes.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\TokenParserBoolExpr.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\TriviaHelpers.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\TokenParser.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\SourceParser.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\AstTransformer.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Trivia.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\Context.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\TriviaContext.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\SourceTransformer.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\CodePrinter.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\CodeFormatterImpl.fs" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\CodeFormatter.fsi" />
+    <Compile Include="..\..\fantomas-latest\src\Fantomas\CodeFormatter.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="editorconfig" Version="0.12.2" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="39.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FantomasCommon\FantomasCommon.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
+  </ItemGroup>
+</Project>

@@ -1,10 +1,24 @@
-﻿using System;
+﻿extern alias FantomasLatest;
+extern alias FantomasStable;
+
+using StableCodeFormatter = FantomasStable::Fantomas.CodeFormatter;
+using LatestCodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
+
+using SourceOrigin = Fantomas.SourceOrigin.SourceOrigin;
+using EditorConfig = Fantomas.Extras.EditorConfig;
+using FormatConfig = Fantomas.FormatConfig;
+
+
+
+using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
+
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.VisualStudio.Commanding;
@@ -16,11 +30,10 @@ using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
-using Fantomas;
-using Task = System.Threading.Tasks.Task;
-using FantomasConfig = Fantomas.FormatConfig.FormatConfig;
-using FantomasEditorConfig = Fantomas.Extras.EditorConfig;
+
 using FSharp.Compiler;
+using Microsoft.FSharp.Core;
+using FSharp.Compiler.Text;
 
 namespace FantomasVs
 {
@@ -38,8 +51,8 @@ namespace FantomasVs
 
         #region Checker
 
-        private readonly Lazy<FSharpChecker> _checker = new Lazy<FSharpChecker>(() =>
-            FSharpChecker.Create(null, null, null, null, null, null, null, null)
+        private readonly Lazy<FSharpChecker> _checker = new(() =>
+            FSharpChecker.Create(null, null, null, null, null, null, null, null, null)
         );
 
         protected FSharpChecker CheckerInstance => _checker.Value;
@@ -48,12 +61,14 @@ namespace FantomasVs
 
         #region Build Options
 
-        protected FantomasConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
+   
+        protected FormatConfig.FormatConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
         {
             var localOptions = args.TextView.Options;
             var indentSpaces = localOptions?.GetIndentSize();
             return fantopts.ToOptions(indentSpaces);
         }
+
 
         #endregion
 
@@ -68,36 +83,86 @@ namespace FantomasVs
             return true;
         }
 
+        private (int, int) ShrinkDiff(string currentText, string replaceWith)
+        {
+            int startOffset = 0, endOffset = 0;
+            var currentLength = currentText.Length;
+            var replaceLength = replaceWith.Length;
+
+            var length = Math.Min(currentLength, replaceLength);
+
+            for (int i = 0; i < length; i++)
+            {
+                if (currentText[i] == replaceWith[i])
+                    startOffset++;
+                else
+                    break;
+            }
+
+            for (int i = 1; i < length; i++)
+            {
+                if ((startOffset + endOffset) >= length)
+                    break;
+
+                if (currentText[currentLength - i] == replaceWith[replaceLength - i])
+                    endOffset++;
+                else
+                    break;
+            }
+
+            return (startOffset, endOffset);
+        }
+
         protected bool DiffPatch(Span span, ITextBuffer buffer, string oldText, string newText)
         {
             var snapshot = buffer.CurrentSnapshot;
 
             using var edit = buffer.CreateEdit();
-            var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, new DiffPlex.Chunkers.LineEndingsPreservingChunker());
+            var diff = Differ.Instance.CreateDiffs(oldText, newText, false, false, AgnosticChunker.Instance);
             var lineOffset = snapshot.GetLineNumberFromPosition(span.Start);
 
             foreach (var current in diff.DiffBlocks)
             {
                 var start = lineOffset + current.DeleteStartA;
 
-                for (int i = 0; i < current.DeleteCountA; i++)
+                if (current.DeleteCountA == current.InsertCountB)
                 {
-                    var ln = snapshot.GetLineFromLineNumber(start + i);
-                    edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
-                }
+                    var count = current.InsertCountB;
+                    var lstart = snapshot.GetLineFromLineNumber(start).Start.Position;
+                    var lend = snapshot.GetLineFromLineNumber(start + count).Start.Position;
+                    var currentText = snapshot.GetText(lstart, lend - lstart);
+                    var replaceWith = count == 1 ? 
+                            diff.PiecesNew[current.InsertStartB] : 
+                            string.Join("", diff.PiecesNew, current.InsertStartB, current.InsertCountB);
+                    var (startOffset, endOffset) = ShrinkDiff(currentText, replaceWith);
+                    var totalOffset = startOffset + endOffset;
 
-                for (int i = 0; i < current.InsertCountB; i++)
+                    var minReplaceWith = replaceWith.Substring(startOffset, replaceWith.Length - totalOffset);
+
+                    edit.Replace(lstart + startOffset, Math.Max(0, lend - lstart - totalOffset), minReplaceWith);
+                }
+                else
                 {
-                    var ln = snapshot.GetLineFromLineNumber(start);
-                    edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
-                }
 
+                    for (int i = 0; i < current.DeleteCountA; i++)
+                    {
+                        var ln = snapshot.GetLineFromLineNumber(start + i);
+                        edit.Delete(ln.Start, ln.LengthIncludingLineBreak);
+                    }
+
+                    for (int i = 0; i < current.InsertCountB; i++)
+                    {
+                        var ln = snapshot.GetLineFromLineNumber(start);
+                        edit.Insert(ln.Start, diff.PiecesNew[current.InsertStartB + i]);
+                    }
+                }
             }
 
             edit.Apply();
             
             return diff.DiffBlocks.Any();
         }
+
         #endregion
 
 
@@ -140,7 +205,9 @@ namespace FantomasVs
             );
 
             var checker = CheckerInstance;
-            var config = (FantomasEditorConfig.tryReadConfiguration(path) ?? GetOptions(args, fantopts)).Value;
+            var isLatest = fantopts.BuildVersion == FantomasOptionsPage.Version.Latest;
+            var editorConfig = Fantomas.Extras.EditorConfig.tryReadConfiguration(path);
+            var config = (editorConfig ?? GetOptions(args, fantopts)).Value;
 
             var hasError = false;
 
@@ -154,14 +221,21 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 };
 
-                var origin = SourceOrigin.SourceOrigin.NewSourceString(originText);
-
-
+                
+                var origin = SourceOrigin.NewSourceString(originText);
                 var fsasync = kind switch
                 {
-                    FormatKind.Document => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
-                    FormatKind.Selection => CodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
-                    FormatKind.IsolatedSelection => CodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+                    FormatKind.Document or FormatKind.IsolatedSelection =>
+                        isLatest ?
+                        LatestCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker)
+                        :
+                        StableCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
+
+                    FormatKind.Selection => 
+                        isLatest ?
+                        LatestCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker)
+                        :
+                        StableCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
                     _ => throw new NotSupportedException()
                 };
 
@@ -201,7 +275,7 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        public static Range.range MakeRange(SnapshotSpan vspan, string path)
+        public static Range MakeRange(SnapshotSpan vspan, string path)
         {
             // Beware that the range argument is inclusive. 
             // If the range has a trailing newline, it will appear in the formatted result.
@@ -213,7 +287,7 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            var range = CodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            var range = StableCodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
             return range;
         }
 
@@ -324,5 +398,5 @@ namespace FantomasVs
 
         #endregion
     }
-
 }
+
