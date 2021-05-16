@@ -1,20 +1,24 @@
-﻿namespace FantomasVs.Editor
-{
-    using Fantomas;
-    using FSharp.Compiler.SourceCodeServices;
-    using Microsoft.FSharp.Collections;
-    using System.Reflection.Metadata.Ecma335;
-    using System.Threading;
-    using System.Windows.Controls;
-    using System.Windows.Data;
+﻿extern alias FantomasLatest;
+extern alias FantomasStable;
 
+using FSharp.Compiler.SourceCodeServices;
+using System;
+using System.Threading;
+using System.Windows.Controls;
+
+
+using StableCodeFormatter = FantomasStable::Fantomas.CodeFormatter;
+using LatestCodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
+
+namespace FantomasVs.Editor
+{
     /// <summary>
     /// Interaction logic for FantomasOptionsPage2.xaml
     /// </summary>
     public partial class FantomasOptionsEditor : UserControl
     {
         public FantomasOptionsPage FantomasOptions { get; }
-        
+
         public EditorPage<FantomasOptionsPage> Editor { get; }
 
         public FSharpChecker FSharpCheckerInstance { get; }
@@ -23,9 +27,19 @@
             @"
             let rec distribute e = function
             | [] -> [[e]]
-            | x::xs as list -> 
+            | x::xs as list ->
                 [e::list] @ [for xs in distribute e xs -> x::xs]
             ";
+
+        #region Checker
+
+        private readonly Lazy<FSharpChecker> _checker = new(() =>
+            FSharpChecker.Create(null, null, null, null, null, null, null, null, null)
+        );
+
+        protected FSharpChecker CheckerInstance => _checker.Value;
+
+        #endregion
 
         public FantomasOptionsEditor()
         {
@@ -35,7 +49,6 @@
             Editor.PropertyEdited += OnPropertyEdited;
             PropertyView.ItemsSource = Editor.View;
             DataContext = Editor;
-            FSharpCheckerInstance = FSharpChecker.Instance;
             OnPropertyEdited(nameof(FantomasOptionsPage.CommitChanges));
         }
 
@@ -53,12 +66,14 @@
               lightSyntax: defaults.LightSyntax,
               compilingFsLib: defaults.CompilingFsLib,
               isExe: true // let's have this on for now
-          );
+            );
 
-            var fsasync = Fantomas.CodeFormatter.FormatDocumentAsync("sample.fsx", Fantomas.SourceOrigin.SourceOrigin.NewSourceString(SampleText), config, opts, FSharpCheckerInstance);
+
+            //var fsasync = LatestCodeFormatter.FormatDocumentAsync("sample.fsx", Fantomas.SourceOrigin.SourceOrigin.NewSourceString(SampleText), config, opts, FSharpCheckerInstance);
+            var fsasync = StableCodeFormatter.FormatDocumentAsync("sample.fsx", Fantomas.SourceOrigin.SourceOrigin.NewSourceString(SampleText), config, opts, FSharpCheckerInstance);
 
             tokenSource?.Cancel();
-            tokenSource?.Dispose();            
+            tokenSource?.Dispose();
 
             tokenSource = new();
 

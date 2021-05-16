@@ -1,21 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>FantomasVs.Editor</RootNamespace>
-    <TargetFramework>net48</TargetFramework>    
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <AssemblyTitle>editor</AssemblyTitle>
-    <UseWPF>true</UseWPF>
-    <LangVersion>9.0</LangVersion>
+  	<OutputType>WinExe</OutputType>
+  	<RootNamespace>FantomasVs.Editor</RootNamespace>
+  	<TargetFramework>net48</TargetFramework>
+  	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  	<AssemblyTitle>editor</AssemblyTitle>
+  	<UseWPF>true</UseWPF>
+  	<LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Fantomas\Fantomas.fsproj" />
-    <ProjectReference Include="..\highlighting\src\FSharp.Highlighting.fsproj" />
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+    <Page Remove="Properties\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="5.0.0" />
+  	<ProjectReference Include="..\..\src\FantomasLatest\FantomasLatest.fsproj">
+  	  <Aliases>FantomasLatest</Aliases>
+  	</ProjectReference>
+  	<ProjectReference Include="..\..\src\FantomasStable\FantomasStable.fsproj">
+      <Aliases>FantomasStable</Aliases>
+  	</ProjectReference>
+  	<ProjectReference Include="..\highlighting\src\FSharp.Highlighting.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+  	<PackageReference Include="FSharp.Core" Version="5.0.1" />
   </ItemGroup>
 </Project>

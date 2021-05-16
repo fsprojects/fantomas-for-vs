@@ -270,6 +270,21 @@ namespace FantomasVs
 
         #endregion
 
+        #region Version
+
+        public enum Version
+        {
+            Stable,
+            Latest
+        }
+
+        [Category("Formatter Version")]
+        [DisplayName("Build Version")]
+        [Description("Select latest if you want bleeding edge features and hotfixes, Stable is the last stable release.")]
+        public Version BuildVersion { get; set; } = Version.Stable;
+
+        #endregion
+
         public FantomasConfig ToOptions(int? spaces)
         {
 
@@ -313,6 +328,8 @@ namespace FantomasVs
                 spaceAroundDelimiter: this.SpaceAroundDelimiter,
 
                 newlineBetweenTypeDefinitionAndMembers: this.NewlineBetweenTypeDefinitionAndMembers,
+                keepIndentInBranch: this.KeepIndentInBranch,
+                blankLinesAroundNestedMultilineExpressions: this.BlankLinesAroundNestedMultilineExpressions,
 
                 strictMode: this.StrictMode
             );
