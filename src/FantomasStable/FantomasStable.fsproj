@@ -2,25 +2,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <Version>4.4.0</Version>
+    <Version>4.5.1</Version>
     <Description>Source code formatter for F#</Description>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\fantomas-stable\src\Fantomas\AssemblyInfo.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\RangeHelpers.fs" />
-    <Compile Include="..\..\fantomas-stable\src\Fantomas\Version.fs" />
+    <Compile Include="..\..\fantomas-stable\src\Fantomas\TriviaTypes.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\Dbg.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\Utils.fs" />
+    <Compile Include="..\..\fantomas-stable\src\Fantomas\AstExtensions.fs" />
+    <Compile Include="..\..\fantomas-stable\src\Fantomas\SourceParser.fs" />
+    <Compile Include="..\..\fantomas-stable\src\Fantomas\AstTransformer.fs" />
+    <Compile Include="..\..\fantomas-stable\src\Fantomas\Version.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\Queue.fs" />
-    <Compile Include="..\..\fantomas-stable\src\Fantomas\TriviaTypes.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\TokenParserBoolExpr.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\TriviaHelpers.fs" />
-    <Compile Include="..\..\fantomas-stable\src\Fantomas\AstTransformer.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\TokenParser.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\Trivia.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\Context.fs" />
-    <Compile Include="..\..\fantomas-stable\src\Fantomas\SourceParser.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\SourceTransformer.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\TriviaContext.fs" />
     <Compile Include="..\..\fantomas-stable\src\Fantomas\CodePrinter.fs" />
