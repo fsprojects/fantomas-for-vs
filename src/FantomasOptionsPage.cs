@@ -169,6 +169,11 @@ namespace FantomasVs
         [DisplayName("Newline Between Type Definition And Members")]
         public bool NewlineBetweenTypeDefinitionAndMembers { get; set; } = Defaults.NewlineBetweenTypeDefinitionAndMembers;
 
+        [Category("Convention")]
+        [DisplayName("Always Add `|` Before Discriminated Union Case")]
+        [Description("If `false`, a `|` character is used only in multiple-case discriminated unions, and is omitted in short single-case DUs")]
+        public bool BarBeforeDiscriminatedUnionDeclaration { get; set; } = Defaults.BarBeforeDiscriminatedUnionDeclaration;
+
 
         [Category("Convention")]
         [DisplayName("Single-Argument Web Mode")]

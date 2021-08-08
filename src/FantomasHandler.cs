@@ -110,6 +110,8 @@ namespace FantomasVs
 
                 newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
 
+                barBeforeDiscriminatedUnionDeclaration: fantopts.BarBeforeDiscriminatedUnionDeclaration,
+
                 strictMode: fantopts.StrictMode
             );
 
