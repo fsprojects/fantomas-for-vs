@@ -16,7 +16,7 @@ namespace FantomasVs
         public const string GuidString = "74927147-72e8-4b47-a70d-5568807d6878";
 
         public static FormatConfig.FormatConfig Defaults => FormatConfig.FormatConfig.Default;
-        
+
         #region Indent
 
         [Category("Indentation")]
@@ -40,7 +40,7 @@ namespace FantomasVs
 
         [Category("Elmish")]
         [DisplayName("Disable for Elmish Syntax")]
-        public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax; 
+        public bool DisableElmishSyntax { get; set; } = Defaults.DisableElmishSyntax;
 
         #endregion
 
@@ -164,7 +164,6 @@ namespace FantomasVs
         [DisplayName("Keep Newline After")]
         public bool KeepIfThenInSameLine { get; set; } = Defaults.KeepIfThenInSameLine;
 
-
         [Category("Convention")]
         [DisplayName("Newline Between Type Definition And Members")]
         public bool NewlineBetweenTypeDefinitionAndMembers { get; set; } = Defaults.NewlineBetweenTypeDefinitionAndMembers;
@@ -173,7 +172,6 @@ namespace FantomasVs
         [DisplayName("Always Add `|` Before Discriminated Union Case")]
         [Description("If `false`, a `|` character is used only in multiple-case discriminated unions, and is omitted in short single-case DUs")]
         public bool BarBeforeDiscriminatedUnionDeclaration { get; set; } = Defaults.BarBeforeDiscriminatedUnionDeclaration;
-
 
         [Category("Convention")]
         [DisplayName("Single-Argument Web Mode")]
