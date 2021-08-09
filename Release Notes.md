@@ -1,6 +1,13 @@
 Release Notes
 ============
 
+0.9
+----
+
+* Update stable Fantomas to 4.5.1
+* Update latest Fantomas to 4.5.1
+* Add 'Always place bar in front of discriminated union' option
+
 0.8.4
 ----
 

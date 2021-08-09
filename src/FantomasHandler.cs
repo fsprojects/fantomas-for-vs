@@ -110,6 +110,8 @@ namespace FantomasVs
 
                 newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
 
+                barBeforeDiscriminatedUnionDeclaration: fantopts.BarBeforeDiscriminatedUnionDeclaration,
+
                 strictMode: fantopts.StrictMode
             );
 
@@ -331,7 +333,7 @@ namespace FantomasVs
 
         public static Range MakeRange(SnapshotSpan vspan, string path)
         {
-            // Beware that the range argument is inclusive. 
+            // Beware that the range argument is inclusive.
             // If the range has a trailing newline, it will appear in the formatted result.
 
             var start = vspan.Start.GetContainingLine();
@@ -368,7 +370,7 @@ namespace FantomasVs
 
         #endregion
 
-        #region Logging 
+        #region Logging
 
         protected void LogTask(Task task)
         {
@@ -407,7 +409,7 @@ namespace FantomasVs
         {
             var selections = args.TextView.Selection.SelectedSpans;
 
-            // This command shouldn't be called 
+            // This command shouldn't be called
             // if there's no selection, but it's bad practice
             // to surface exceptions to VS
             if (selections.Count == 0)

@@ -4,7 +4,7 @@
         <Identity Id="FantomasVs.ef00bfc2-a899-45fc-aae8-afecf8673aaf" Version="0.9" Language="en-US" Publisher="Asti" />
         <DisplayName>F# Formatting</DisplayName>
         <Description xml:space="preserve">F# source code formatting using Fantomas. 
-Built against 4.4.0 stable and 4.5.0 alpha</Description>
+Built against 4.5.1 stable</Description>
         <MoreInfo>https://github.com/deviousasti/fsharp-formatting-for-vs</MoreInfo>
         <License>Resources\License.txt</License>
         <ReleaseNotes>Resources\ReleaseNotes.html</ReleaseNotes>
