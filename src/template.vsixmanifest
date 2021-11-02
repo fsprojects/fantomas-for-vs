@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="FantomasVs.ef00bfc2-a899-45fc-aae8-afecf8673aaf" Version="0.9.3" Language="en-US" Publisher="Asti" />
+        <Identity Id="FantomasVs.ef00bfc2-a899-45fc-aae8-afecf8673aaf" Version="{{version}}" Language="en-US" Publisher="Asti" />
         <DisplayName>F# Formatting</DisplayName>
         <Description xml:space="preserve">F# source code formatting using Fantomas. 
-Built against 4.5.5 stable</Description>
+Built against {{latestTag}} stable</Description>
         <MoreInfo>https://github.com/deviousasti/fsharp-formatting-for-vs</MoreInfo>
-        <License>License.txt</License>
-        <ReleaseNotes>ReleaseNotes.html</ReleaseNotes>
-        <Icon>logo.png</Icon>
-        <PreviewImage>logo.png</PreviewImage>
+        <License>Resources\License.txt</License>
+        <ReleaseNotes>Resources\ReleaseNotes.html</ReleaseNotes>
+        <Icon>Resources\logo.png</Icon>
+        <PreviewImage>Resources\logo.png</PreviewImage>
         <Tags>fsharp, formatting, fantomas, source, beautify</Tags>
     </Metadata>
     <Installation>
@@ -26,4 +26,3 @@ Built against 4.5.5 stable</Description>
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
     </Assets>
 </PackageManifest>
-

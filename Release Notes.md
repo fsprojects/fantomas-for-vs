@@ -1,6 +1,16 @@
 Release Notes
 ============
 
+0.9.3
+----
+
+* Update Fantomas to 4.5.5
+
+0.9.2
+----
+
+* Update Fantomas to 4.5.4
+
 0.9.1
 ----
 
