@@ -25,19 +25,26 @@ popd
 
 pushd ./fantomas-latest
 
-git checkout master
+#git checkout master
 
-git pull
+#git pull
 
 popd
 
-pushd ./src
 
-$template = cat -Raw template.vsixmanifest
+function update-version {
+param($dir)
+
+pushd $dir
+$template = cat -Raw .\template.vsixmanifest
 $ver = getTag
 $nextVersion = [Version]::new($ver.Major, $ver.Minor, $ver.Build + 1)
 $manifest = $template.Replace("{{latestTag}}", $latestTag).Replace("{{version}}", $nextVersion)
 $manifest | Out-File -FilePath .\source.extension.vsixmanifest -Encoding utf8
-
 popd
+
+}
+
+update-version .\src\FantomasVs.VS2019
+update-version .\src\FantomasVs.VS2022
 
