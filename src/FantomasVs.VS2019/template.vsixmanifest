@@ -6,10 +6,10 @@
         <Description xml:space="preserve">F# source code formatting using Fantomas. 
 Built against {{latestTag}} stable</Description>
         <MoreInfo>https://github.com/deviousasti/fsharp-formatting-for-vs</MoreInfo>
-        <License>Resources\License.txt</License>
-        <ReleaseNotes>Resources\ReleaseNotes.html</ReleaseNotes>
-        <Icon>Resources\logo.png</Icon>
-        <PreviewImage>Resources\logo.png</PreviewImage>
+        <License>License.txt</License>
+        <ReleaseNotes>ReleaseNotes.html</ReleaseNotes>
+        <Icon>logo.png</Icon>
+        <PreviewImage>logo.png</PreviewImage>
         <Tags>fsharp, formatting, fantomas, source, beautify</Tags>
     </Metadata>
     <Installation>
