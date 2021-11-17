@@ -31,3 +31,6 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 *.vsix
+
+#Rider
+.idea/
