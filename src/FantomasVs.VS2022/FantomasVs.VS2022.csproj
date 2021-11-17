@@ -87,22 +87,6 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FantomasCommon\FantomasCommon.fsproj">
-      <Project>{647e5969-f130-4400-adf6-232b5bb22f32}</Project>
-      <Name>FantomasCommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FantomasLatest\FantomasLatest.fsproj">
-      <Project>{64606723-3b28-4afc-8cd9-6886d334bd48}</Project>
-      <Name>FantomasLatest</Name>
-      <Aliases>FantomasLatest</Aliases>
-    </ProjectReference>
-    <ProjectReference Include="..\FantomasStable\FantomasStable.fsproj">
-      <Project>{0e38584a-8312-4662-921c-86e57cfa9d26}</Project>
-      <Name>FantomasStable</Name>
-      <Aliases>FantomasStable</Aliases>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\Resources\ReleaseNotes.html">
       <Link>ReleaseNotes.html</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
