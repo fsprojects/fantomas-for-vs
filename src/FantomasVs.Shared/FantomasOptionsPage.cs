@@ -18,11 +18,6 @@ namespace FantomasVs
         public bool ApplyDiff { get; set; } = true;
 
         [Category("Performance")]
-        [DisplayName("Warmup On Start")]
-        [Description("Runs through formatting code on startup to warm up the Jit. Reduces delay when first using it.")]
-        public bool WarmUpOnStartup { get; set; } = false;
-
-        [Category("Performance")]
         [DisplayName("Enable SpaceBar Heating")]
         [Description("xkcd/1172")]
         public bool EnableSpaceBarHeating { get; set; } = false;
