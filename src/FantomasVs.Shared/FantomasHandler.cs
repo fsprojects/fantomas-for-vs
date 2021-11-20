@@ -1,15 +1,3 @@
-﻿extern alias FantomasLatest;
-extern alias FantomasStable;
-
-using StableCodeFormatter = FantomasStable::Fantomas.CodeFormatter;
-using LatestCodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
-
-using SourceOrigin = Fantomas.SourceOrigin.SourceOrigin;
-using EditorConfig = Fantomas.Extras.EditorConfig;
-using FormatConfig = Fantomas.FormatConfig;
-
-
-
 using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
@@ -19,21 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-using FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
 using Microsoft.VisualStudio.Commanding;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor.Commanding;
 using Microsoft.VisualStudio.Text.Editor.Commanding.Commands;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
-using FSharp.Compiler;
-using Microsoft.FSharp.Core;
-using FSharp.Compiler.Text;
+using Fantomas.Client;
 
 namespace FantomasVs
 {
@@ -48,78 +31,6 @@ namespace FantomasVs
         ICommandHandler<SaveCommandArgs>
     {
         public string DisplayName => "Automatic Formatting";
-
-        #region Checker
-
-        private readonly Lazy<FSharpChecker> _checker = new(() =>
-            FSharpChecker.Create(null, null, null, null, null, null, null, null, null)
-        );
-
-        protected FSharpChecker CheckerInstance => _checker.Value;
-
-        #endregion
-
-        #region Build Options
-
-
-        protected FormatConfig.FormatConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
-        {
-            var localOptions = args.TextView.Options;
-            var indentSpaces = localOptions?.GetIndentSize();
-
-            var config = new FormatConfig.FormatConfig(
-                indentSize: indentSpaces ?? fantopts.IndentSize,
-                indentOnTryWith: fantopts.IndentOnTryWith,
-                keepIndentInBranch: fantopts.KeepIndentInBranch,
-
-                disableElmishSyntax: fantopts.DisableElmishSyntax,
-                maxArrayOrListWidth: fantopts.MaxArrayOrListWidth,
-                maxElmishWidth: fantopts.MaxElmishWidth,
-                maxFunctionBindingWidth: fantopts.MaxFunctionBindingWidth,
-                maxValueBindingWidth: fantopts.MaxValueBindingWidth,
-                maxIfThenElseShortWidth: fantopts.MaxIfThenElseShortWidth,
-                maxInfixOperatorExpression: fantopts.MaxInfixOperatorExpression,
-                maxLineLength: fantopts.MaxLineLength,
-                maxRecordWidth: fantopts.MaxRecordWidth,
-                maxRecordNumberOfItems: fantopts.MaxRecordNumberOfItems,
-                multilineBlockBracketsOnSameColumn: fantopts.MultilineBlockBracketsOnSameColumn,
-                recordMultilineFormatter: fantopts.RecordMultilineFormatter,
-                arrayOrListMultilineFormatter: fantopts.ArrayOrListMultilineFormatter,
-                maxArrayOrListNumberOfItems: fantopts.MaxArrayOrListNumberOfItems,
-                maxDotGetExpressionWidth: fantopts.MaxDotGetExpressionWidth,
-                keepIfThenInSameLine: fantopts.KeepIfThenInSameLine,
-                singleArgumentWebMode: fantopts.SingleArgumentWebMode,
-                alignFunctionSignatureToIndentation: fantopts.AlignFunctionSignatureToIndentation,
-                alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
-                multiLineLambdaClosingNewline: fantopts.MultiLineLambdaClosingNewline,
-                endOfLine: fantopts.EndOfLine,
-                blankLinesAroundNestedMultilineExpressions: fantopts.BlankLinesAroundNestedMultilineExpressions,
-
-                semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
-
-                spaceBeforeClassConstructor: fantopts.SpaceBeforeClassConstructor,
-                spaceBeforeLowercaseInvocation: fantopts.SpaceBeforeLowercaseInvocation,
-                spaceBeforeUppercaseInvocation: fantopts.SpaceBeforeUppercaseInvocation,
-                spaceBeforeMember: fantopts.SpaceBeforeMember,
-                spaceBeforeParameter: fantopts.SpaceBeforeParameter,
-                spaceBeforeColon: fantopts.SpaceBeforeColon,
-                spaceAfterComma: fantopts.SpaceAfterComma,
-                spaceAfterSemicolon: fantopts.SpaceAfterSemicolon,
-                spaceBeforeSemicolon: fantopts.SpaceBeforeSemicolon,
-                spaceAroundDelimiter: fantopts.SpaceAroundDelimiter,
-
-                newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
-
-                barBeforeDiscriminatedUnionDeclaration: fantopts.BarBeforeDiscriminatedUnionDeclaration,
-
-                strictMode: fantopts.StrictMode
-            );
-
-            return config;
-        }
-
-
-        #endregion
 
         #region Patching
 
@@ -244,27 +155,11 @@ namespace FantomasVs
             var buffer = args.TextView.TextBuffer;
             var caret = args.TextView.Caret.Position;
 
+            var service = instance.FantomasService;
             var fantopts = instance.Options;
-            var defaults = FSharpParsingOptions.Default;
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
             var hasDiff = false;
-
-            var opts = new FSharpParsingOptions(
-                sourceFiles: new string[] { path },
-                conditionalCompilationDefines: defaults.ConditionalCompilationDefines,
-                errorSeverityOptions: defaults.ErrorSeverityOptions,
-                isInteractive: defaults.IsInteractive,
-                lightSyntax: defaults.LightSyntax,
-                compilingFsLib: defaults.CompilingFsLib,
-                isExe: true // let's have this on for now
-            );
-
-            var checker = CheckerInstance;
-            var isLatest = fantopts.BuildVersion == FantomasOptionsPage.Version.Latest;
-            var editorConfig = Fantomas.Extras.EditorConfig.tryReadConfiguration(path);
-            var config = (editorConfig ?? GetOptions(args, fantopts)).Value;
-
             var hasError = false;
 
             try
@@ -277,34 +172,44 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 };
 
-
-                var origin = SourceOrigin.NewSourceString(originText);
-                var fsasync = kind switch
+                var response = await (kind switch
                 {
                     FormatKind.Document or FormatKind.IsolatedSelection =>
-                        isLatest ?
-                        LatestCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker)
-                        :
-                        StableCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
-
+                        service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null), token),
                     FormatKind.Selection =>
-                        isLatest ?
-                        LatestCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker)
-                        :
-                        StableCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
+                        service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan, path)), token),
                     _ => throw new NotSupportedException()
-                };
+                });
 
-                var newText = await FSharpAsync.StartAsTask(fsasync, null, token);
-                var oldText = vspan.GetText();
+                switch ((LSPFantomasServiceTypes.FantomasResponseCode)response.Code)
+                {
+                    case LSPFantomasServiceTypes.FantomasResponseCode.Formatted:
+                        var newText = response.Content.Value;
+                        var oldText = vspan.GetText();
 
-                if (fantopts.ApplyDiff)
-                {
-                    hasDiff = DiffPatch(vspan, buffer, oldText, newText);
-                }
-                else
-                {
-                    hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
+                        if (fantopts.ApplyDiff)
+                        {
+                            hasDiff = DiffPatch(vspan, buffer, oldText, newText);
+                        }
+                        else
+                        {
+                            hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
+                        }
+                        break;
+                    case LSPFantomasServiceTypes.FantomasResponseCode.UnChanged:
+                    case LSPFantomasServiceTypes.FantomasResponseCode.Ignored:
+                        break;
+                    case LSPFantomasServiceTypes.FantomasResponseCode.Error:
+                    case LSPFantomasServiceTypes.FantomasResponseCode.ToolNotFound:
+                    case LSPFantomasServiceTypes.FantomasResponseCode.FileNotFound:
+                    case LSPFantomasServiceTypes.FantomasResponseCode.FilePathIsNotAbsolute:
+                        hasError = true;
+                        var error = response.Content.Value;
+                        Trace.TraceError(error);
+                        await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
+                        break;
+                    default:
+                        throw new NotSupportedException($"The {nameof(LSPFantomasServiceTypes.FantomasResponseCode)} value '{response.Code}' is unexpected.");
                 }
             }
             catch (Exception ex)
@@ -331,7 +236,7 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        public static Range MakeRange(SnapshotSpan vspan, string path)
+        public static Contracts.FormatSelectionRange MakeRange(SnapshotSpan vspan, string path)
         {
             // Beware that the range argument is inclusive.
             // If the range has a trailing newline, it will appear in the formatted result.
@@ -343,7 +248,7 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            var range = StableCodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            var range = new Contracts.FormatSelectionRange(startLine, startCol, endLine, endCol);
             return range;
         }
 
