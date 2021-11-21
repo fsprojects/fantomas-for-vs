@@ -39,8 +39,6 @@ namespace FantomasVs
 
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();
 
-        public IComponentModel MefHost { get; private set; }
-
         public IVsStatusbar Statusbar { get; private set; }
 
         public Contracts.FantomasService FantomasService { get; private set; }
@@ -58,7 +56,6 @@ namespace FantomasVs
         {            
             Trace.WriteLine("Fantomas Vs Package Loaded");
 
-            MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
             FantomasService = new LSPFantomasService.LSPFantomasService();
 
