@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Fantomas.Client;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -38,9 +39,9 @@ namespace FantomasVs
 
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();
 
-        public IComponentModel MefHost { get; private set; }
-
         public IVsStatusbar Statusbar { get; private set; }
+
+        public Contracts.FantomasService FantomasService { get; private set; }
 
         #region Package Members
 
@@ -55,9 +56,9 @@ namespace FantomasVs
         {            
             Trace.WriteLine("Fantomas Vs Package Loaded");
 
-            MefHost = await this.GetServiceAsync<SComponentModel, IComponentModel>();
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
-            
+            FantomasService = new LSPFantomasService.LSPFantomasService();
+
             // signal that package is ready
             _instance.SetResult(this);
 
@@ -65,6 +66,24 @@ namespace FantomasVs
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    FantomasService.Dispose();
+                    Trace.WriteLine("Fantomas Vs Package Disposed");
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.ToString());
+                }
+            }
+
+            base.Dispose(disposing);
         }
 
         #endregion

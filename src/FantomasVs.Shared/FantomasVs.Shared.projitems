@@ -16,7 +16,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)FantomasVsPackage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FantomasWarmUp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fantomas.Client" Version="0.3.4" />
   </ItemGroup>
 </Project>
