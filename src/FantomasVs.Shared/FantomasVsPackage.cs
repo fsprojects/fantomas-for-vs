@@ -72,8 +72,15 @@ namespace FantomasVs
         {
             if (disposing)
             {
-                Trace.WriteLine("Fantomas Vs Package Disposing");
-                FantomasService.Dispose();
+                try
+                {
+                    FantomasService.Dispose();
+                    Trace.WriteLine("Fantomas Vs Package Disposed");
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.ToString());
+                }
             }
 
             base.Dispose(disposing);

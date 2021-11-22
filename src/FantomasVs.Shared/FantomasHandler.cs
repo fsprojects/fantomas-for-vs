@@ -17,6 +17,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
 using Fantomas.Client;
+using FantomasResponseCode = Fantomas.Client.LSPFantomasServiceTypes.FantomasResponseCode;
 
 namespace FantomasVs
 {
@@ -181,35 +182,39 @@ namespace FantomasVs
                     _ => throw new NotSupportedException()
                 });
 
-                switch ((LSPFantomasServiceTypes.FantomasResponseCode)response.Code)
+                switch ((FantomasResponseCode)response.Code)
                 {
-                    case LSPFantomasServiceTypes.FantomasResponseCode.Formatted:
-                        var newText = response.Content.Value;
-                        var oldText = vspan.GetText();
+                    case FantomasResponseCode.Formatted:
+                        {
+                            var newText = response.Content.Value;
+                            var oldText = vspan.GetText();
 
-                        if (fantopts.ApplyDiff)
-                        {
-                            hasDiff = DiffPatch(vspan, buffer, oldText, newText);
+                            if (fantopts.ApplyDiff)
+                            {
+                                hasDiff = DiffPatch(vspan, buffer, oldText, newText);
+                            }
+                            else
+                            {
+                                hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
+                            }
+                            break;
                         }
-                        else
+                    case FantomasResponseCode.UnChanged:
+                    case FantomasResponseCode.Ignored:
+                        break;
+                    case FantomasResponseCode.Error:
+                    case FantomasResponseCode.ToolNotFound:
+                    case FantomasResponseCode.FileNotFound:
+                    case FantomasResponseCode.FilePathIsNotAbsolute:
                         {
-                            hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
+                            hasError = true;
+                            var error = response.Content.Value;
+                            Trace.TraceError(error);
+                            await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
+                            break;
                         }
-                        break;
-                    case LSPFantomasServiceTypes.FantomasResponseCode.UnChanged:
-                    case LSPFantomasServiceTypes.FantomasResponseCode.Ignored:
-                        break;
-                    case LSPFantomasServiceTypes.FantomasResponseCode.Error:
-                    case LSPFantomasServiceTypes.FantomasResponseCode.ToolNotFound:
-                    case LSPFantomasServiceTypes.FantomasResponseCode.FileNotFound:
-                    case LSPFantomasServiceTypes.FantomasResponseCode.FilePathIsNotAbsolute:
-                        hasError = true;
-                        var error = response.Content.Value;
-                        Trace.TraceError(error);
-                        await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
-                        break;
                     default:
-                        throw new NotSupportedException($"The {nameof(LSPFantomasServiceTypes.FantomasResponseCode)} value '{response.Code}' is unexpected.");
+                        throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.");
                 }
             }
             catch (Exception ex)
@@ -248,7 +253,11 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            var range = new Contracts.FormatSelectionRange(startLine, startCol, endLine, endCol);
+            var range = new Contracts.FormatSelectionRange(
+                startLine: startLine,
+                startColumn: startCol,
+                endLine: endLine,
+                endColumn: endCol);
             return range;
         }
 
