@@ -19,6 +19,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fantomas.Client" Version="0.3.4" />
+    <PackageReference Include="Fantomas.Client" Version="0.4.0" />
   </ItemGroup>
 </Project>
