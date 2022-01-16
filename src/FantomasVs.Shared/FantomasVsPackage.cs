@@ -40,6 +40,8 @@ namespace FantomasVs
         public FantomasOptionsPage Options => GetDialogPage(typeof(FantomasOptionsPage)) as FantomasOptionsPage ?? new FantomasOptionsPage();
 
         public IVsStatusbar Statusbar { get; private set; }
+        
+        public IVsThreadedWaitDialogFactory DialogFactory { get; private set; }
 
         public Contracts.FantomasService FantomasService { get; private set; }
 
@@ -57,6 +59,7 @@ namespace FantomasVs
             Trace.WriteLine("Fantomas Vs Package Loaded");
 
             Statusbar = await this.GetServiceAsync<SVsStatusbar, IVsStatusbar>();
+            DialogFactory = await this.GetServiceAsync<SVsThreadedWaitDialogFactory, IVsThreadedWaitDialogFactory>();
             FantomasService = new LSPFantomasService.LSPFantomasService();
 
             // signal that package is ready

@@ -16,9 +16,19 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)FantomasVsPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InstallChoice.xaml.cs">
+      <DependentUpon>$(MSBuildThisFileDirectory)InstallChoice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Theme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fantomas.Client" Version="0.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)InstallChoice.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

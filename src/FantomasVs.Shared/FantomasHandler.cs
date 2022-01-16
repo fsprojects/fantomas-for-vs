@@ -133,7 +133,6 @@ namespace FantomasVs
 
         #endregion
 
-
         #region Formatting
 
         public enum FormatKind
@@ -202,8 +201,14 @@ namespace FantomasVs
                     case FantomasResponseCode.UnChanged:
                     case FantomasResponseCode.Ignored:
                         break;
-                    case FantomasResponseCode.Error:
                     case FantomasResponseCode.ToolNotFound:
+                        {
+                            var view = new InstallChoiceWindow();
+                            await Install(view.GetDialogAction());
+                            break;
+                        }
+
+                    case FantomasResponseCode.Error:
                     case FantomasResponseCode.FileNotFound:
                     case FantomasResponseCode.FilePathIsNotAbsolute:
                         {
@@ -239,6 +244,82 @@ namespace FantomasVs
             await SetStatusAsync("Ready.", instance, token);
 
             return hasDiff;
+        }
+
+        protected async Task DisplayTaskProgress(string caption, Func<CancellationToken, Task> task, CancellationToken token)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
+            var instance = await FantomasVsPackage.Instance.WithCancellation(token);
+            var dialogFactory = instance.DialogFactory;
+            using var dialog = dialogFactory.StartWaitDialog(caption);
+
+        }
+
+        protected async Task<(bool, string)> RunProcessAsync(string name, string args, CancellationToken token)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = name,
+                Arguments = args,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
+
+            try
+            {
+                using var process = Process.Start(startInfo);
+                var output = await process.StandardOutput.ReadToEndAsync().WithCancellation(token);
+                var exitCode = process.ExitCode;
+                return (exitCode == 0 && !token.IsCancellationRequested, output);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.ToString());
+            }
+        }
+
+        public async Task<bool> Install(InstallAction installAction)
+        {
+            bool LaunchUrl(string uri)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex);
+                    return false;
+                }
+            }
+
+            bool LaunchDotnet(string caption, string args)
+            {
+                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "...", (_prog, token) => RunProcessAsync("dotnet", args, token));
+                Trace.WriteLine(output);
+                return success;
+            }
+
+            switch (installAction)
+            {
+                case InstallAction.Global:
+                    LaunchDotnet("Installing global tool", "tool install -g fantomas-tool");
+                    break;
+                case InstallAction.Local:
+                    LaunchDotnet("Installing local tool", "tool install fantomas-tool");
+                    break;
+                case InstallAction.ShowDocs:
+                    LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool");
+                    break;
+                case InstallAction.None:
+                default:
+                    // do nothing
+                    break;
+            }
+
+            return true;
         }
 
         public static Contracts.FormatSelectionRange MakeRange(SnapshotSpan vspan, string path)
