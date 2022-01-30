@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)InstallChoice.xaml.cs">
       <DependentUpon>$(MSBuildThisFileDirectory)InstallChoice.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)OuptutLogging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Theme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
   </ItemGroup>
