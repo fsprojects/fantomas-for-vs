@@ -1,11 +1,12 @@
-<Window x:Class="FantomasVs.InstallChoiceWindow"
+<platformui:DialogWindow x:Class="FantomasVs.InstallChoiceWindow"
+    xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0" 
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="clr-namespace:FantomasVs"
 	mc:Ignorable="d"
-	Height="450" Width="400"
+	Height="475" Width="400"
     WindowStartupLocation="CenterOwner"
     ResizeMode="NoResize"
     Title="Choose install"
@@ -18,7 +19,13 @@
             <Setter Property="Margin" Value="0,4" />
             <Setter Property="Padding" Value="5,8" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <!--<Setter Property="Background" Value="{DynamicResource {x:Static local:Theme.ButtonFace}}" />-->
+            <Setter Property="Background" Value="{DynamicResource {x:Static local:Theme.ButtonFace}}" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static local:Theme.ButtonText}}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#333" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap" />
@@ -75,9 +82,9 @@
             </StackPanel>
         </Button>
 
-        <TextBlock>
+        <TextBlock Margin="0,10">
             You can <Hyperlink Command="{Binding}" CommandParameter="{x:Static local:InstallAction.ShowDocs}">read the documentation</Hyperlink> to find out more.
         </TextBlock>
   
     </StackPanel>
-</Window>
+</platformui:DialogWindow>

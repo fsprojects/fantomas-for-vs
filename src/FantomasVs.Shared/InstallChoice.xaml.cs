@@ -1,3 +1,4 @@
+using Microsoft.VisualStudio.PlatformUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,7 +30,7 @@ namespace FantomasVs
     /// <summary>
     /// Interaction logic for InstallChoiceWindow.xaml
     /// </summary>
-    public partial class InstallChoiceWindow : Window
+    public partial class InstallChoiceWindow : DialogWindow
     {
         class ChoiceCommand : ICommand
         {   
