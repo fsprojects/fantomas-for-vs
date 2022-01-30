@@ -178,7 +178,7 @@ namespace FantomasVs
                         service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null), token),
                     FormatKind.Selection =>
                         service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan, path)), token),
-                    _ => throw new NotSupportedException()
+                    _ => throw new NotSupportedException($"Operation {kind} is not supported")
                 });
 
                 switch ((FantomasResponseCode)response.Code)
@@ -204,7 +204,11 @@ namespace FantomasVs
                     case FantomasResponseCode.ToolNotFound:
                         {
                             var view = new InstallChoiceWindow();
-                            await Install(view.GetDialogAction());
+                            var success = await InstallAsync(view.GetDialogAction(), token);
+                            if (success)
+                                await FormatAsync(vspan, args, context, kind);
+                            else
+                                await FocusLogAsync(token);
                             break;
                         }
 
@@ -214,18 +218,23 @@ namespace FantomasVs
                         {
                             hasError = true;
                             var error = response.Content.Value;
-                            Trace.TraceError(error);
                             await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
+                            await WriteLogAsync(error, token);
+                            await FocusLogAsync(token);
                             break;
                         }
                     default:
                         throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.");
                 }
             }
+            catch (NotSupportedException ex)
+            {
+                await WriteLogAsync($"The operation is not supported:\n {ex.Message}", token);
+            }
             catch (Exception ex)
             {
                 hasError = true;
-                Trace.TraceError(ex.ToString());
+                await WriteLogAsync($"The formatting operation failed:\n {ex}", token);
                 await SetStatusAsync($"Could not format: {ex.Message.Replace(path, "")}", instance, token);
             }
 
@@ -246,15 +255,6 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        protected async Task DisplayTaskProgress(string caption, Func<CancellationToken, Task> task, CancellationToken token)
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
-            var instance = await FantomasVsPackage.Instance.WithCancellation(token);
-            var dialogFactory = instance.DialogFactory;
-            using var dialog = dialogFactory.StartWaitDialog(caption);
-
-        }
-
         protected async Task<(bool, string)> RunProcessAsync(string name, string args, CancellationToken token)
         {
             var startInfo = new ProcessStartInfo
@@ -263,25 +263,31 @@ namespace FantomasVs
                 Arguments = args,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
             try
             {
                 using var process = Process.Start(startInfo);
-                var output = await process.StandardOutput.ReadToEndAsync().WithCancellation(token);
-                var exitCode = process.ExitCode;
-                return (exitCode == 0 && !token.IsCancellationRequested, output);
+                var exitCode = await process.WaitForExitAsync();
+                var output = exitCode switch
+                {
+                    0 => await process.StandardOutput.ReadToEndAsync().WithCancellation(token),
+                    _ => await process.StandardError.ReadToEndAsync().WithCancellation(token)
+                };
+
+                return (exitCode == 0, output);
             }
             catch (Exception ex)
             {
-                return (false, ex.ToString());
+                return (false, $"Failed to run dotnet tool {ex}");
             }
         }
 
-        public async Task<bool> Install(InstallAction installAction)
+        public async Task<bool> InstallAsync(InstallAction installAction, CancellationToken token)
         {
-            bool LaunchUrl(string uri)
+            async Task<bool> LaunchUrl(string uri)
             {
                 try
                 {
@@ -290,36 +296,28 @@ namespace FantomasVs
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine(ex);
+                    await WriteLogAsync($"Failed to launch url: {uri}\n{ex}", token);
                     return false;
                 }
             }
 
-            bool LaunchDotnet(string caption, string args)
+            async Task<bool> LaunchDotnet(string caption, string args)
             {
-                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "...", (_prog, token) => RunProcessAsync("dotnet", args, token));
-                Trace.WriteLine(output);
+                await WriteLogAsync(caption, token);
+                await WriteLogAsync("Running dotnet installation...", token);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
+                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, token));
+                await WriteLogAsync(output, token);
                 return success;
             }
 
-            switch (installAction)
+            return installAction switch
             {
-                case InstallAction.Global:
-                    LaunchDotnet("Installing global tool", "tool install -g fantomas-tool");
-                    break;
-                case InstallAction.Local:
-                    LaunchDotnet("Installing local tool", "tool install fantomas-tool");
-                    break;
-                case InstallAction.ShowDocs:
-                    LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool");
-                    break;
-                case InstallAction.None:
-                default:
-                    // do nothing
-                    break;
-            }
-
-            return true;
+                InstallAction.Global => await LaunchDotnet("Installing global tool", "tool install -g fantomas-tool"),
+                InstallAction.Local => await LaunchDotnet("Installing local tool", "tool install fantomas-tool"),
+                InstallAction.ShowDocs => await LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool"),
+                _ => true, // do nothing
+            };
         }
 
         public static Contracts.FormatSelectionRange MakeRange(SnapshotSpan vspan, string path)
@@ -349,7 +347,6 @@ namespace FantomasVs
             return FormatAsync(vspan, args, context, FormatKind.Document);
         }
 
-
         protected async Task SetStatusAsync(string text, FantomasVsPackage instance, CancellationToken token)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
@@ -362,6 +359,16 @@ namespace FantomasVs
             // Set the status bar text and make its display static.
             statusBar.SetText(text);
         }
+
+        #endregion
+
+        #region Output Window
+
+        public OuptutLogging Logging { get; } = new();
+
+        public Task WriteLogAsync(string text, CancellationToken token) => Logging.LogTextAsync(text, token);
+
+        public Task FocusLogAsync(CancellationToken token) => Logging.BringToFrontAsync(token);
 
         #endregion
 
