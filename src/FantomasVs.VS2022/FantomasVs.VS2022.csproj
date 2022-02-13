@@ -68,6 +68,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+	<PackageReference Include="Fantomas.Client">
+		<Version>0.5.1</Version>
+	</PackageReference>
     <PackageReference Include="DiffPlex">
       <Version>1.7.0</Version>
     </PackageReference>
