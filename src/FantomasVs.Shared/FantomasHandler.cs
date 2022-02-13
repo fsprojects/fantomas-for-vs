@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -204,12 +204,13 @@ namespace FantomasVs
                     case FantomasResponseCode.ToolNotFound:
                         {
                             var view = new InstallChoiceWindow();
-                            var result = await InstallAsync(view.GetDialogAction(), token);
+                            var workingDir = System.IO.Path.GetDirectoryName(path);
+                            var result = await InstallAsync(view.GetDialogAction(), workingDir, token);
                             switch (result)
                             {
                                 case InstallResult.Succeded:
                                     {
-                                        ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed.");
+                                        ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed!");
                                         await FormatAsync(vspan, args, context, kind);
                                         break;
                                     }
@@ -267,7 +268,7 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        protected async Task<(bool, string)> RunProcessAsync(string name, string args, CancellationToken token)
+        protected async Task<(bool, string)> RunProcessAsync(string name, string args, string workingDir, CancellationToken token)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -276,7 +277,8 @@ namespace FantomasVs
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                WorkingDirectory = workingDir
             };
 
             try
@@ -297,7 +299,7 @@ namespace FantomasVs
             }
         }
 
-        public async Task<InstallResult> InstallAsync(InstallAction installAction, CancellationToken token)
+        public async Task<InstallResult> InstallAsync(InstallAction installAction, string workingDir, CancellationToken token)
         {
             async Task<InstallResult> LaunchUrl(string uri)
             {
@@ -318,7 +320,7 @@ namespace FantomasVs
                 await WriteLogAsync(caption, token);
                 await WriteLogAsync("Running dotnet installation...", token);
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
-                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, token));
+                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, workingDir, token));
                 await WriteLogAsync(output, token);
                 return success ? InstallResult.Succeded : InstallResult.Failed;
             }
