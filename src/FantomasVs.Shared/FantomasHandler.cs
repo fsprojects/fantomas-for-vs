@@ -211,7 +211,10 @@ namespace FantomasVs
                                 case InstallResult.Succeded:
                                     {
                                         ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed!");
-                                        await FormatAsync(vspan, args, context, kind);
+                                        using (var session = ThreadedWaitDialogHelper.StartWaitDialog(instance.DialogFactory, "Starting instance..."))
+                                        {
+                                            await FormatAsync(vspan, args, context, kind);
+                                        }
                                         break;
                                     }
                                 case InstallResult.Failed:
@@ -284,7 +287,10 @@ namespace FantomasVs
             try
             {
                 using var process = Process.Start(startInfo);
-                var exitCode = await process.WaitForExitAsync();
+                var exitCode = await process.WaitForExitAsync(token);
+                
+                token.ThrowIfCancellationRequested();
+
                 var output = exitCode switch
                 {
                     0 => await process.StandardOutput.ReadToEndAsync().WithCancellation(token),
@@ -327,8 +333,8 @@ namespace FantomasVs
 
             return installAction switch
             {
-                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install -g fantomas-tool"),
-                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install fantomas-tool"),
+                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install --verbosity normal --global fantomas-tool"),
+                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install --verbosity normal fantomas-tool"),
                 InstallAction.ShowDocs => await LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool"),
                 _ => InstallResult.Skipped, // do nothing
             };
