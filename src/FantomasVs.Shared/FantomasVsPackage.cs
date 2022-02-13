@@ -43,7 +43,8 @@ namespace FantomasVs
         public IVsOutputWindow OutputPane { get; private set; }
         public IVsThreadedWaitDialogFactory DialogFactory { get; private set; }
 
-        public Contracts.FantomasService FantomasService { get; private set; }
+        private Lazy<Contracts.FantomasService> _fantomasService = new (() => new LSPFantomasService.LSPFantomasService());
+        public Contracts.FantomasService FantomasService => _fantomasService.Value;
 
         #region Package Members
 
@@ -62,8 +63,6 @@ namespace FantomasVs
             OutputPane = await this.GetServiceAsync<SVsOutputWindow, IVsOutputWindow>();
             DialogFactory = await this.GetServiceAsync<SVsThreadedWaitDialogFactory, IVsThreadedWaitDialogFactory>();            
             
-            FantomasService = new LSPFantomasService.LSPFantomasService();
-
             // signal that package is ready
             _instance.SetResult(this);
 
@@ -84,7 +83,7 @@ namespace FantomasVs
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError(ex.ToString());
+                    Trace.WriteLine(ex);
                 }
             }
 

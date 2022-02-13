@@ -27,6 +27,13 @@ namespace FantomasVs
         ShowDocs
     }
 
+    public enum InstallResult
+    {
+        Skipped,
+        Succeded,
+        Failed
+    }
+
     /// <summary>
     /// Interaction logic for InstallChoiceWindow.xaml
     /// </summary>

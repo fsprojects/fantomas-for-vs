@@ -169,7 +169,7 @@ namespace FantomasVs
                     FormatKind.Document => buffer.CurrentSnapshot.GetText(),
                     FormatKind.Selection => buffer.CurrentSnapshot.GetText(),
                     FormatKind.IsolatedSelection => vspan.GetText(),
-                    _ => throw new NotSupportedException()
+                    _ => throw new NotSupportedException($"Operation {kind} is not supported")
                 };
 
                 var response = await (kind switch
@@ -204,11 +204,23 @@ namespace FantomasVs
                     case FantomasResponseCode.ToolNotFound:
                         {
                             var view = new InstallChoiceWindow();
-                            var success = await InstallAsync(view.GetDialogAction(), token);
-                            if (success)
-                                await FormatAsync(vspan, args, context, kind);
-                            else
-                                await FocusLogAsync(token);
+                            var result = await InstallAsync(view.GetDialogAction(), token);
+                            switch (result)
+                            {
+                                case InstallResult.Succeded:
+                                    {
+                                        ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed.");
+                                        await FormatAsync(vspan, args, context, kind);
+                                        break;
+                                    }
+                                case InstallResult.Failed:
+                                    {
+                                        ModalDialogWindow.ShowDialog("Fantomas Tool could not be installed. You may not have a tool manifest set up. Please check the log for details.");
+                                        await FocusLogAsync(token);
+                                        break;
+                                    }
+                            }
+
                             break;
                         }
 
@@ -285,38 +297,38 @@ namespace FantomasVs
             }
         }
 
-        public async Task<bool> InstallAsync(InstallAction installAction, CancellationToken token)
+        public async Task<InstallResult> InstallAsync(InstallAction installAction, CancellationToken token)
         {
-            async Task<bool> LaunchUrl(string uri)
+            async Task<InstallResult> LaunchUrl(string uri)
             {
                 try
                 {
                     Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
-                    return true;
                 }
                 catch (Exception ex)
                 {
                     await WriteLogAsync($"Failed to launch url: {uri}\n{ex}", token);
-                    return false;
                 }
+
+                return InstallResult.Skipped;
             }
 
-            async Task<bool> LaunchDotnet(string caption, string args)
+            async Task<InstallResult> LaunchDotnet(string caption, string args)
             {
                 await WriteLogAsync(caption, token);
                 await WriteLogAsync("Running dotnet installation...", token);
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
                 var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, token));
                 await WriteLogAsync(output, token);
-                return success;
+                return success ? InstallResult.Succeded : InstallResult.Failed;
             }
 
             return installAction switch
             {
-                InstallAction.Global => await LaunchDotnet("Installing global tool", "tool install -g fantomas-tool"),
-                InstallAction.Local => await LaunchDotnet("Installing local tool", "tool install fantomas-tool"),
+                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install -g fantomas-tool"),
+                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install fantomas-tool"),
                 InstallAction.ShowDocs => await LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool"),
-                _ => true, // do nothing
+                _ => InstallResult.Skipped, // do nothing
             };
         }
 
@@ -376,10 +388,10 @@ namespace FantomasVs
 
         protected void LogTask(Task task)
         {
-            var _ = task.ContinueWith(t =>
+            var _ = task.ContinueWith(async t =>
             {
                 if (t.IsFaulted)
-                    Trace.TraceError(t.Exception.ToString());
+                    await WriteLogAsync(t.Exception.ToString(), CancellationToken.None);
             }, TaskScheduler.Default);
         }
 
