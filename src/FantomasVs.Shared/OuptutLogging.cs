@@ -54,7 +54,7 @@ namespace FantomasVs
             {
                 var pane = await GetPaneAsync(token);
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
-                pane.OutputString(text + Environment.NewLine);
+                pane.OutputStringThreadSafe(text + Environment.NewLine);
             }
             catch (Exception)
             {
