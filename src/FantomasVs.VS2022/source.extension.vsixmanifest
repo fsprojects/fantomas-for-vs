@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="FantomasVs.4acfe0e3-4521-45ed-9c32-9265806f4108" Version="1.0.0" Language="en-US" Publisher="Asti" />
+        <Identity Id="FantomasVs.4acfe0e3-4521-45ed-9c32-9265806f4108" Version="1.0.1" Language="en-US" Publisher="Asti" />
         <DisplayName>F# Formatting</DisplayName>
         <Description xml:space="preserve">F# source code formatting using Fantomas. </Description>
         <MoreInfo>https://github.com/deviousasti/fsharp-formatting-for-vs</MoreInfo>
