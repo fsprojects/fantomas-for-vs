@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+1.0
+----
+
+* Use `Fantomas.Client` which supports installing  and using Fantomas as a dotnet tools instead of being bundled with the extension
+  
 0.9.4
 ----
 

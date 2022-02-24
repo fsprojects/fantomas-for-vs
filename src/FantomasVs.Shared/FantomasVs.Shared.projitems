@@ -16,7 +16,27 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)FantomasVsPackage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FantomasWarmUp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InstallChoice.xaml.cs">
+      <DependentUpon>InstallChoice.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ModalDialog.xaml.cs">
+      <DependentUpon>ModalDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)OuptutLogging.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Theme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fantomas.Client" Version="0.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)InstallChoice.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)ModalDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

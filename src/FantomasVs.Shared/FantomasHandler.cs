@@ -1,16 +1,4 @@
-﻿extern alias FantomasLatest;
-extern alias FantomasStable;
-
-using StableCodeFormatter = FantomasStable::Fantomas.CodeFormatter;
-using LatestCodeFormatter = FantomasLatest::Fantomas.CodeFormatter;
-
-using SourceOrigin = Fantomas.SourceOrigin.SourceOrigin;
-using EditorConfig = Fantomas.Extras.EditorConfig;
-using FormatConfig = Fantomas.FormatConfig;
-
-
-
-using System;
+﻿using System;
 using DiffPlex;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -19,21 +7,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-using FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
 using Microsoft.VisualStudio.Commanding;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor.Commanding;
 using Microsoft.VisualStudio.Text.Editor.Commanding.Commands;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Threading;
 
-using FSharp.Compiler;
-using Microsoft.FSharp.Core;
-using FSharp.Compiler.Text;
+using Fantomas.Client;
+using FantomasResponseCode = Fantomas.Client.LSPFantomasServiceTypes.FantomasResponseCode;
 
 namespace FantomasVs
 {
@@ -48,78 +32,6 @@ namespace FantomasVs
         ICommandHandler<SaveCommandArgs>
     {
         public string DisplayName => "Automatic Formatting";
-
-        #region Checker
-
-        private readonly Lazy<FSharpChecker> _checker = new(() =>
-            FSharpChecker.Create(null, null, null, null, null, null, null, null, null)
-        );
-
-        protected FSharpChecker CheckerInstance => _checker.Value;
-
-        #endregion
-
-        #region Build Options
-
-
-        protected FormatConfig.FormatConfig GetOptions(EditorCommandArgs args, FantomasOptionsPage fantopts)
-        {
-            var localOptions = args.TextView.Options;
-            var indentSpaces = localOptions?.GetIndentSize();
-
-            var config = new FormatConfig.FormatConfig(
-                indentSize: indentSpaces ?? fantopts.IndentSize,
-                indentOnTryWith: fantopts.IndentOnTryWith,
-                keepIndentInBranch: fantopts.KeepIndentInBranch,
-
-                disableElmishSyntax: fantopts.DisableElmishSyntax,
-                maxArrayOrListWidth: fantopts.MaxArrayOrListWidth,
-                maxElmishWidth: fantopts.MaxElmishWidth,
-                maxFunctionBindingWidth: fantopts.MaxFunctionBindingWidth,
-                maxValueBindingWidth: fantopts.MaxValueBindingWidth,
-                maxIfThenElseShortWidth: fantopts.MaxIfThenElseShortWidth,
-                maxInfixOperatorExpression: fantopts.MaxInfixOperatorExpression,
-                maxLineLength: fantopts.MaxLineLength,
-                maxRecordWidth: fantopts.MaxRecordWidth,
-                maxRecordNumberOfItems: fantopts.MaxRecordNumberOfItems,
-                multilineBlockBracketsOnSameColumn: fantopts.MultilineBlockBracketsOnSameColumn,
-                recordMultilineFormatter: fantopts.RecordMultilineFormatter,
-                arrayOrListMultilineFormatter: fantopts.ArrayOrListMultilineFormatter,
-                maxArrayOrListNumberOfItems: fantopts.MaxArrayOrListNumberOfItems,
-                maxDotGetExpressionWidth: fantopts.MaxDotGetExpressionWidth,
-                keepIfThenInSameLine: fantopts.KeepIfThenInSameLine,
-                singleArgumentWebMode: fantopts.SingleArgumentWebMode,
-                alignFunctionSignatureToIndentation: fantopts.AlignFunctionSignatureToIndentation,
-                alternativeLongMemberDefinitions: fantopts.AlternativeLongMemberDefinitions,
-                multiLineLambdaClosingNewline: fantopts.MultiLineLambdaClosingNewline,
-                endOfLine: fantopts.EndOfLine,
-                blankLinesAroundNestedMultilineExpressions: fantopts.BlankLinesAroundNestedMultilineExpressions,
-
-                semicolonAtEndOfLine: fantopts.SemicolonAtEndOfLine,
-
-                spaceBeforeClassConstructor: fantopts.SpaceBeforeClassConstructor,
-                spaceBeforeLowercaseInvocation: fantopts.SpaceBeforeLowercaseInvocation,
-                spaceBeforeUppercaseInvocation: fantopts.SpaceBeforeUppercaseInvocation,
-                spaceBeforeMember: fantopts.SpaceBeforeMember,
-                spaceBeforeParameter: fantopts.SpaceBeforeParameter,
-                spaceBeforeColon: fantopts.SpaceBeforeColon,
-                spaceAfterComma: fantopts.SpaceAfterComma,
-                spaceAfterSemicolon: fantopts.SpaceAfterSemicolon,
-                spaceBeforeSemicolon: fantopts.SpaceBeforeSemicolon,
-                spaceAroundDelimiter: fantopts.SpaceAroundDelimiter,
-
-                newlineBetweenTypeDefinitionAndMembers: fantopts.NewlineBetweenTypeDefinitionAndMembers,
-
-                barBeforeDiscriminatedUnionDeclaration: fantopts.BarBeforeDiscriminatedUnionDeclaration,
-
-                strictMode: fantopts.StrictMode
-            );
-
-            return config;
-        }
-
-
-        #endregion
 
         #region Patching
 
@@ -221,7 +133,6 @@ namespace FantomasVs
 
         #endregion
 
-
         #region Formatting
 
         public enum FormatKind
@@ -244,27 +155,11 @@ namespace FantomasVs
             var buffer = args.TextView.TextBuffer;
             var caret = args.TextView.Caret.Position;
 
+            var service = instance.FantomasService;
             var fantopts = instance.Options;
-            var defaults = FSharpParsingOptions.Default;
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
             var hasDiff = false;
-
-            var opts = new FSharpParsingOptions(
-                sourceFiles: new string[] { path },
-                conditionalCompilationDefines: defaults.ConditionalCompilationDefines,
-                errorSeverityOptions: defaults.ErrorSeverityOptions,
-                isInteractive: defaults.IsInteractive,
-                lightSyntax: defaults.LightSyntax,
-                compilingFsLib: defaults.CompilingFsLib,
-                isExe: true // let's have this on for now
-            );
-
-            var checker = CheckerInstance;
-            var isLatest = fantopts.BuildVersion == FantomasOptionsPage.Version.Latest;
-            var editorConfig = Fantomas.Extras.EditorConfig.tryReadConfiguration(path);
-            var config = (editorConfig ?? GetOptions(args, fantopts)).Value;
-
             var hasError = false;
 
             try
@@ -274,43 +169,88 @@ namespace FantomasVs
                     FormatKind.Document => buffer.CurrentSnapshot.GetText(),
                     FormatKind.Selection => buffer.CurrentSnapshot.GetText(),
                     FormatKind.IsolatedSelection => vspan.GetText(),
-                    _ => throw new NotSupportedException()
+                    _ => throw new NotSupportedException($"Operation {kind} is not supported")
                 };
 
-
-                var origin = SourceOrigin.NewSourceString(originText);
-                var fsasync = kind switch
+                var response = await (kind switch
                 {
                     FormatKind.Document or FormatKind.IsolatedSelection =>
-                        isLatest ?
-                        LatestCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker)
-                        :
-                        StableCodeFormatter.FormatDocumentAsync(path, origin, config, opts, checker),
-
+                        service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null), token),
                     FormatKind.Selection =>
-                        isLatest ?
-                        LatestCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker)
-                        :
-                        StableCodeFormatter.FormatSelectionAsync(path, MakeRange(vspan, path), origin, config, opts, checker),
-                    _ => throw new NotSupportedException()
-                };
+                        service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan, path)), token),
+                    _ => throw new NotSupportedException($"Operation {kind} is not supported")
+                });
 
-                var newText = await FSharpAsync.StartAsTask(fsasync, null, token);
-                var oldText = vspan.GetText();
+                switch ((FantomasResponseCode)response.Code)
+                {
+                    case FantomasResponseCode.Formatted:
+                        {
+                            var newText = response.Content.Value;
+                            var oldText = vspan.GetText();
 
-                if (fantopts.ApplyDiff)
-                {
-                    hasDiff = DiffPatch(vspan, buffer, oldText, newText);
+                            if (fantopts.ApplyDiff)
+                            {
+                                hasDiff = DiffPatch(vspan, buffer, oldText, newText);
+                            }
+                            else
+                            {
+                                hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
+                            }
+                            break;
+                        }
+                    case FantomasResponseCode.UnChanged:
+                    case FantomasResponseCode.Ignored:
+                        break;
+                    case FantomasResponseCode.ToolNotFound:
+                        {
+                            var view = new InstallChoiceWindow();
+                            var workingDir = System.IO.Path.GetDirectoryName(path);
+                            var result = await InstallAsync(view.GetDialogAction(), workingDir, token);
+                            switch (result)
+                            {
+                                case InstallResult.Succeded:
+                                    {
+                                        ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed!");
+                                        using (var session = ThreadedWaitDialogHelper.StartWaitDialog(instance.DialogFactory, "Starting instance..."))
+                                        {
+                                            await FormatAsync(vspan, args, context, kind);
+                                        }
+                                        break;
+                                    }
+                                case InstallResult.Failed:
+                                    {
+                                        ModalDialogWindow.ShowDialog("Fantomas Tool could not be installed. You may not have a tool manifest set up. Please check the log for details.");
+                                        await FocusLogAsync(token);
+                                        break;
+                                    }
+                            }
+
+                            break;
+                        }
+
+                    case FantomasResponseCode.Error:
+                    case FantomasResponseCode.FileNotFound:
+                    case FantomasResponseCode.FilePathIsNotAbsolute:
+                        {
+                            hasError = true;
+                            var error = response.Content.Value;
+                            await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
+                            await WriteLogAsync(error, token);
+                            await FocusLogAsync(token);
+                            break;
+                        }
+                    default:
+                        throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.");
                 }
-                else
-                {
-                    hasDiff = ReplaceAll(vspan, buffer, oldText, newText);
-                }
+            }
+            catch (NotSupportedException ex)
+            {
+                await WriteLogAsync($"The operation is not supported:\n {ex.Message}", token);
             }
             catch (Exception ex)
             {
                 hasError = true;
-                Trace.TraceError(ex.ToString());
+                await WriteLogAsync($"The formatting operation failed:\n {ex}", token);
                 await SetStatusAsync($"Could not format: {ex.Message.Replace(path, "")}", instance, token);
             }
 
@@ -331,7 +271,76 @@ namespace FantomasVs
             return hasDiff;
         }
 
-        public static Range MakeRange(SnapshotSpan vspan, string path)
+        protected async Task<(bool, string)> RunProcessAsync(string name, string args, string workingDir, CancellationToken token)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = name,
+                Arguments = args,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDir
+            };
+
+            try
+            {
+                using var process = Process.Start(startInfo);
+                var exitCode = await process.WaitForExitAsync(token);
+                
+                token.ThrowIfCancellationRequested();
+
+                var output = exitCode switch
+                {
+                    0 => await process.StandardOutput.ReadToEndAsync().WithCancellation(token),
+                    _ => await process.StandardError.ReadToEndAsync().WithCancellation(token)
+                };
+
+                return (exitCode == 0, output);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to run dotnet tool {ex}");
+            }
+        }
+
+        public async Task<InstallResult> InstallAsync(InstallAction installAction, string workingDir, CancellationToken token)
+        {
+            async Task<InstallResult> LaunchUrl(string uri)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
+                }
+                catch (Exception ex)
+                {
+                    await WriteLogAsync($"Failed to launch url: {uri}\n{ex}", token);
+                }
+
+                return InstallResult.Skipped;
+            }
+
+            async Task<InstallResult> LaunchDotnet(string caption, string args)
+            {
+                await WriteLogAsync(caption, token);
+                await WriteLogAsync("Running dotnet installation...", token);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
+                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, workingDir, token));
+                await WriteLogAsync(output, token);
+                return success ? InstallResult.Succeded : InstallResult.Failed;
+            }
+
+            return installAction switch
+            {
+                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install --verbosity normal --global fantomas-tool"),
+                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install --verbosity normal fantomas-tool"),
+                InstallAction.ShowDocs => await LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool"),
+                _ => InstallResult.Skipped, // do nothing
+            };
+        }
+
+        public static Contracts.FormatSelectionRange MakeRange(SnapshotSpan vspan, string path)
         {
             // Beware that the range argument is inclusive.
             // If the range has a trailing newline, it will appear in the formatted result.
@@ -343,7 +352,11 @@ namespace FantomasVs
             var endLine = end.LineNumber + 1;
             var endCol = Math.Max(0, vspan.End.Position - end.Start.Position - 1);
 
-            var range = StableCodeFormatter.MakeRange(fileName: path, startLine: startLine, startCol: startCol, endLine: endLine, endCol: endCol);
+            var range = new Contracts.FormatSelectionRange(
+                startLine: startLine,
+                startColumn: startCol,
+                endLine: endLine,
+                endColumn: endCol);
             return range;
         }
 
@@ -353,7 +366,6 @@ namespace FantomasVs
             var vspan = new SnapshotSpan(snapshot, new Span(0, snapshot.Length));
             return FormatAsync(vspan, args, context, FormatKind.Document);
         }
-
 
         protected async Task SetStatusAsync(string text, FantomasVsPackage instance, CancellationToken token)
         {
@@ -370,14 +382,24 @@ namespace FantomasVs
 
         #endregion
 
+        #region Output Window
+
+        public OuptutLogging Logging { get; } = new();
+
+        public Task WriteLogAsync(string text, CancellationToken token) => Logging.LogTextAsync(text, token);
+
+        public Task FocusLogAsync(CancellationToken token) => Logging.BringToFrontAsync(token);
+
+        #endregion
+
         #region Logging
 
         protected void LogTask(Task task)
         {
-            var _ = task.ContinueWith(t =>
+            var _ = task.ContinueWith(async t =>
             {
                 if (t.IsFaulted)
-                    Trace.TraceError(t.Exception.ToString());
+                    await WriteLogAsync(t.Exception.ToString(), CancellationToken.None);
             }, TaskScheduler.Default);
         }
 
