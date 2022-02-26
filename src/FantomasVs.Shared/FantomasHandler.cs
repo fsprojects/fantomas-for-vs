@@ -5,19 +5,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Task = System.Threading.Tasks.Task;
 
 using Microsoft.VisualStudio.Commanding;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor.Commanding;
 using Microsoft.VisualStudio.Text.Editor.Commanding.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Threading;
+using ThreadHelper = Microsoft.VisualStudio.Shell.ThreadHelper;
+using ThreadedWaitDialogHelper = Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
 
 using Fantomas.Client;
 using FantomasResponseCode = Fantomas.Client.LSPFantomasServiceTypes.FantomasResponseCode;
+using Microsoft.VisualStudio.Threading;
 
 namespace FantomasVs
 {
@@ -326,7 +326,9 @@ namespace FantomasVs
                 await WriteLogAsync(caption, token);
                 await WriteLogAsync("Running dotnet installation...", token);
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
-                var (success, output) = ThreadHelper.JoinableTaskFactory.Run(caption, "Please wait...", (_prog, token) => RunProcessAsync("dotnet", args, workingDir, token));
+                var instance = await FantomasVsPackage.Instance;
+                using var session = ThreadedWaitDialogHelper.StartWaitDialog(instance.DialogFactory, caption);
+                var (success, output) = await RunProcessAsync("dotnet", args, workingDir, session.UserCancellationToken);
                 await WriteLogAsync(output, token);
                 return success ? InstallResult.Succeded : InstallResult.Failed;
             }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using OutputPane = Microsoft.VisualStudio.Shell.Interop.IVsOutputWindowPane;
 using System.Diagnostics;
 using System.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace FantomasVs
 {
