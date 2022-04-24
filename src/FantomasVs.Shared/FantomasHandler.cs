@@ -240,7 +240,7 @@ namespace FantomasVs
                             break;
                         }
                     default:
-                        throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.");
+                        throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.\n Error: {response.Content?.Value}");
                 }
             }
             catch (NotSupportedException ex)
