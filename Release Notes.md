@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+1.1
+----
+* Improved logging and better diagnostics
+* Update `Fantomas.Client` to `0.5.4`
+
 1.0
 ----
 

@@ -57,9 +57,11 @@ namespace FantomasVs
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(token);
                 pane.OutputStringThreadSafe(text + Environment.NewLine);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Trace.WriteLine(text);
+                Trace.WriteLine("Logging error:");
+                Trace.WriteLine(ex);
             }
         }
 

@@ -159,6 +159,7 @@ namespace FantomasVs
             var fantopts = instance.Options;
             var document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
             var path = document.FilePath;
+            var workingDir = System.IO.Path.GetDirectoryName(path);
             var hasDiff = false;
             var hasError = false;
 
@@ -203,8 +204,7 @@ namespace FantomasVs
                         break;
                     case FantomasResponseCode.ToolNotFound:
                         {
-                            var view = new InstallChoiceWindow();
-                            var workingDir = System.IO.Path.GetDirectoryName(path);
+                            var view = new InstallChoiceWindow();                            
                             var result = await InstallAsync(view.GetDialogAction(), workingDir, token);
                             switch (result)
                             {
@@ -219,6 +219,7 @@ namespace FantomasVs
                                     }
                                 case InstallResult.Failed:
                                     {
+                                        hasError = true;
                                         ModalDialogWindow.ShowDialog("Fantomas Tool could not be installed. You may not have a tool manifest set up. Please check the log for details.");
                                         await FocusLogAsync(token);
                                         break;
@@ -239,8 +240,24 @@ namespace FantomasVs
                             await FocusLogAsync(token);
                             break;
                         }
+                    case FantomasResponseCode.DaemonCreationFailed:
+                        {
+                            await WriteLogAsync($"Creating the Fantomas Daemon failed:\n{response.Content?.Value}", token);
+                            await FocusLogAsync(token);
+                            hasError = true;
+                            break;
+                        }
                     default:
                         throw new NotSupportedException($"The {nameof(FantomasResponseCode)} value '{response.Code}' is unexpected.\n Error: {response.Content?.Value}");
+                }
+
+                if(hasError)
+                {
+                    await WriteLogAsync("Attempting to find Fantomas Tool...", token);
+                    var folder = LSPFantomasServiceTypes.Folder.NewFolder(workingDir);
+                    var toolLocation = FantomasToolLocator.findFantomasTool(folder);
+                    var result = toolLocation.IsError ? $"Failed to find tool: {toolLocation.ErrorValue}" : $"Found at: {toolLocation.ResultValue}";
+                    await WriteLogAsync(result, token);
                 }
             }
             catch (NotSupportedException ex)
@@ -288,7 +305,7 @@ namespace FantomasVs
             {
                 using var process = Process.Start(startInfo);
                 var exitCode = await process.WaitForExitAsync(token);
-                
+
                 token.ThrowIfCancellationRequested();
 
                 var output = exitCode switch
@@ -402,6 +419,7 @@ namespace FantomasVs
             {
                 if (t.IsFaulted)
                     await WriteLogAsync(t.Exception.ToString(), CancellationToken.None);
+
             }, TaskScheduler.Default);
         }
 
