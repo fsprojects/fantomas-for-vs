@@ -12,6 +12,8 @@ This is a front-end for the wonderful [**Fantomas**](https://github.com/fsprojec
 - Fully asynchronous, does not increase project load times
 - Loaded when required
 - Respects key-bindings
+- Not coupled to a specific version of Fantomas. Works with whichever version is installed on your machine
+- Supports both global and local dotnet tool installation
 
 ## Options
 
