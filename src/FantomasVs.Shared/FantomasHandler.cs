@@ -352,9 +352,9 @@ namespace FantomasVs
 
             return installAction switch
             {
-                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install --verbosity normal --global fantomas-tool"),
-                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install --verbosity normal fantomas-tool"),
-                InstallAction.ShowDocs => await LaunchUrl("https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#using-the-command-line-tool"),
+                InstallAction.Global => await LaunchDotnet("Installing tool globally", "tool install --verbosity normal --global fantomas"),
+                InstallAction.Local => await LaunchDotnet("Installing tool locally", "tool install --verbosity normal fantomas"),
+                InstallAction.ShowDocs => await LaunchUrl("https://fsprojects.github.io/fantomas/docs/index.html"),
                 _ => InstallResult.Skipped, // do nothing
             };
         }
