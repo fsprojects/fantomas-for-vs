@@ -210,7 +210,7 @@ namespace FantomasVs
                             {
                                 case InstallResult.Succeded:
                                     {
-                                        ModalDialogWindow.ShowDialog("Fantomas Tool was succesfully installed!");
+                                        InstallResultDialog.ShowDialog("Fantomas Tool was succesfully installed!");
                                         using (var session = ThreadedWaitDialogHelper.StartWaitDialog(instance.DialogFactory, "Starting instance..."))
                                         {
                                             await FormatAsync(vspan, args, context, kind);
@@ -220,7 +220,7 @@ namespace FantomasVs
                                 case InstallResult.Failed:
                                     {
                                         hasError = true;
-                                        ModalDialogWindow.ShowDialog("Fantomas Tool could not be installed. You may not have a tool manifest set up. Please check the log for details.");
+                                        InstallResultDialog.ShowDialog("Fantomas Tool could not be installed. You may not have a tool manifest set up. Please check the log for details.");
                                         await FocusLogAsync(token);
                                         break;
                                     }

@@ -19,8 +19,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)InstallChoice.xaml.cs">
       <DependentUpon>InstallChoice.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)ModalDialog.xaml.cs">
-      <DependentUpon>ModalDialog.xaml</DependentUpon>
+    <Compile Include="$(MSBuildThisFileDirectory)InstallResultDialog.xaml.cs">
+      <DependentUpon>InstallResultDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)OuptutLogging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Theme.cs" />
@@ -34,7 +34,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)ModalDialog.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)InstallResultDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

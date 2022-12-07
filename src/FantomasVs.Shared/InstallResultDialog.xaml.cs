@@ -20,9 +20,9 @@ namespace FantomasVs
     /// <summary>
     /// Interaction logic for ModalDialogWindow.xaml
     /// </summary>
-    public partial class ModalDialogWindow : DialogWindow
+    public partial class InstallResultDialog : DialogWindow
     {
-        public ModalDialogWindow()
+        public InstallResultDialog()
         {
             InitializeComponent();
         }
@@ -49,7 +49,7 @@ namespace FantomasVs
 
         public static void ShowDialog(string text)
         {
-            new ModalDialogWindow().ShowModal(text);
+            new InstallResultDialog().ShowModal(text);
         }
     }
 }

@@ -1,4 +1,4 @@
-<platformui:DialogWindow x:Class="FantomasVs.ModalDialogWindow"
+<platformui:DialogWindow x:Class="FantomasVs.InstallResultDialog"
     xmlns:platformui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0" 
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -42,8 +42,8 @@
                     <LineBreak />
                     <Run FontSize="14">To view logs, select 'F# Formatting' in the Output Window.</Run>
                 </Paragraph>
-                <Paragraph>                                        
-                    <Hyperlink NavigateUri="https://github.com/fsprojects/fantomas/blob/master/docs/Documentation.md#configuration">See documentation on how to configure style</Hyperlink>
+                <Paragraph>
+                    <Hyperlink NavigateUri="https://fsprojects.github.io/fantomas/docs/end-users/Configuration.html">See documentation on how to configure style</Hyperlink>
                     <LineBreak />
                     <Hyperlink NavigateUri="https://fsprojects.github.io/fantomas-tools/#/fantomas/preview">Try out options in online preview</Hyperlink>
                     <LineBreak />
