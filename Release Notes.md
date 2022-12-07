@@ -1,8 +1,15 @@
 Release Notes
 ============
 
-1.1
-----
+1.2.0
+-----
+* Fix dotnet tool install name and fantomas docs link (#41) thanks to @AkosLukacs
+* Fix broken documentation links (#42)
+* Upgrade `Fantomas.Client` to `0.7.0` (#42)
+* Upgrade `editorconfig` to `0.13` (#42)
+
+1.1.0
+-----
 * Improved logging and better diagnostics
 * Update `Fantomas.Client` to `0.5.4`
 
