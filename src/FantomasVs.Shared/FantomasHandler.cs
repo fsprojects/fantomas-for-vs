@@ -172,11 +172,10 @@ namespace FantomasVs
                     FormatKind.IsolatedSelection => vspan.GetText(),
                     _ => throw new NotSupportedException($"Operation {kind} is not supported")
                 };
-
                 var response = await (kind switch
                 {
                     FormatKind.Document or FormatKind.IsolatedSelection =>
-                        service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null), token),
+                        service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null, MakeCursorPosition(caret.BufferPosition)), token),
                     FormatKind.Selection =>
                         service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan, path)), token),
                     _ => throw new NotSupportedException($"Operation {kind} is not supported")
@@ -357,6 +356,13 @@ namespace FantomasVs
                 InstallAction.ShowDocs => await LaunchUrl("https://fsprojects.github.io/fantomas/docs/index.html"),
                 _ => InstallResult.Skipped, // do nothing
             };
+        }
+
+        public static Contracts.FormatCursorPosition MakeCursorPosition(SnapshotPoint point)
+        {
+            var line = point.GetContainingLine();
+            var startCol = Math.Max(0, point.Position - line.Start.Position - 1);
+            return new Contracts.FormatCursorPosition(line.LineNumber + 1, startCol);
         }
 
         public static Contracts.FormatSelectionRange MakeRange(SnapshotSpan vspan, string path)
