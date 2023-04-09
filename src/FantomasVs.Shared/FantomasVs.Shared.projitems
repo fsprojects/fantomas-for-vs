@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)FantomasOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)FantomasServiceExport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FantomasVsPackage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InstallChoice.xaml.cs">
       <DependentUpon>InstallChoice.xaml</DependentUpon>
@@ -22,7 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)InstallResultDialog.xaml.cs">
       <DependentUpon>InstallResultDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)OuptutLogging.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutputLogging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Theme.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredefinedCommandHandlerNames.cs" />
   </ItemGroup>
