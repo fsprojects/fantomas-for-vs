@@ -177,11 +177,17 @@ namespace FantomasVs
                     FormatKind.Document or FormatKind.IsolatedSelection =>
                         service.FormatDocumentAsync(new Contracts.FormatDocumentRequest(originText, path, null, MakeCursorPosition(caret.BufferPosition)), token),
                     FormatKind.Selection =>
-                        service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan, path)), token),
+#if VS2019
+                        //new Contracts.FantomasResponse((int)FantomasResponseCode.Error, path, "Format selection not supported on VS2019 for now", null, null)
+                        Task.FromResult(default(Contracts.FantomasResponse)),
+#else
+                        service.FormatSelectionAsync(new Contracts.FormatSelectionRequest(originText, path, null, MakeRange(vspan)), token),
+#endif
                     _ => throw new NotSupportedException($"Operation {kind} is not supported")
                 });
 
-                switch ((FantomasResponseCode)response.Code)
+                var responseCode = response == null ? FantomasResponseCode.Error : (FantomasResponseCode)response.Code;
+                switch (responseCode)
                 {
                     case FantomasResponseCode.Formatted:
                         {
@@ -233,7 +239,7 @@ namespace FantomasVs
                     case FantomasResponseCode.FilePathIsNotAbsolute:
                         {
                             hasError = true;
-                            var error = response.Content.Value;
+                            var error = response?.Content?.Value;
                             await SetStatusAsync($"Could not format: {error.Replace(path, "")}", instance, token);
                             await WriteLogAsync(error, token);
                             await FocusLogAsync(token);
@@ -405,7 +411,7 @@ namespace FantomasVs
             statusBar.SetText(text);
         }
 
-        #endregion
+#endregion
 
         #region Output Window
 
