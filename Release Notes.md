@@ -1,6 +1,11 @@
 Release Notes
 ============
 
+1.3.0
+-----
+* Add initial support for Fantomas cursor
+* Upgrade `Fantomas.Client` to `0.7.0` (#51)
+
 1.2.0
 -----
 * Fix dotnet tool install name and fantomas docs link (#41) thanks to @AkosLukacs
